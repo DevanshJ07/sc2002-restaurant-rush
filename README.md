@@ -8,7 +8,9 @@ Repository setup only; no runnable game has been implemented yet. Build and run 
 
 ## Coding ownership
 
-See [CODING_PLAN.md](CODING_PLAN.md) for the proposed two-person responsibility split and integration checkpoints.
+Devansh owns the controller, CLI, application setup, arrivals and final integration. ZN owns the domain classes and staff behaviour.
+
+See [CODING_PLAN.md](CODING_PLAN.md) for detailed responsibilities, the shared API contract, parallel development instructions, acceptance checks and copyable AI prompts. A sequential fallback is included.
 
 ## Stage releases
 

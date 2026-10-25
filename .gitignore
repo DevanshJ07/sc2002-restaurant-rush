@@ -14,3 +14,7 @@ Thumbs.db
 # Local secrets
 .env
 .env.*
+
+# Disposable contract stubs and local checks
+.local-stubs/
+.local-checks/
