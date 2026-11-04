@@ -22,9 +22,9 @@ seat 4 2
 wait
 order 2
 cook 2
-serve 2
-wait
 seat 5 1
+cook 2
+serve 2
 wait
 order 1
 cook 1

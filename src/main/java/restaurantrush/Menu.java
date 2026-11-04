@@ -38,4 +38,18 @@ public class Menu {
         }
         return null;
     }
+
+    /** Highest price wins; the first item added wins a tie. Empty menu is an invalid configuration. */
+    public MenuItem getMostExpensiveItem() {
+        if (items.isEmpty()) {
+            throw new IllegalArgumentException("Menu must contain at least one item");
+        }
+        MenuItem best = items.get(0);
+        for (MenuItem item : items) {
+            if (item.getPriceInCents() > best.getPriceInCents()) {
+                best = item;
+            }
+        }
+        return best;
+    }
 }

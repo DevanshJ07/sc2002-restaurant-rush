@@ -19,6 +19,8 @@ public class ArrivalSchedule {
         for (int id = 1; id <= 6; id++) {
             arrivals.put(1 + (id - 1) * 3, new RegularCustomer(id));
         }
+        arrivals.put(4, new VIPCustomer(2));
+        arrivals.put(10, new CriticCustomer(4));
         return new ArrivalSchedule(arrivals);
     }
 

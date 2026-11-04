@@ -1,6 +1,6 @@
 # SC2002 Restaurant Rush
 
-Group 4's offline Java CLI restaurant-management game, following the approved Refined Class Design v3 and assignment brief. This snapshot is **Stage 1**.
+Group 4's offline Java CLI restaurant-management game, following the approved Refined Class Design v3 and assignment brief. This snapshot is **Stage 2**.
 
 ## Run on Windows
 
@@ -46,7 +46,7 @@ Get-Content examples/defeat.txt | & 'C:/Program Files/BlueJ/jdk/bin/java.exe' -c
 
 Replace the Java executable path with your JDK's path as needed. On macOS/Linux: `java -cp out restaurantrush.Main < examples/victory.txt` (likewise for defeat).
 
-Verified Stage 1 victory: 5 paid, $66.00, average 79.20, 18 turns. Defeat (Wait throughout): 0 paid, $0.00, average N/A, 18 turns. `IntegrationChecks` replays both through the actual CLI. Tests also check the six-turn Regular Pasta example (payment satisfaction 76), invalid choices, timing, abandonment and victory boundaries.
+Verified Stage 2 victory: 5 paid, $73.50, average 75.60, 18 turns. Defeat (Wait throughout): 0 paid, $0.00, average N/A, 18 turns. `IntegrationChecks` replays both through the actual CLI. Tests also check the six-turn Regular Pasta example (payment satisfaction 76), invalid choices, timing, abandonment and victory boundaries.
 
 ## Ownership and stage history
 
@@ -55,6 +55,7 @@ ZN supplied the domain/staff classes and domain checks in a ZIP handoff. Devansh
 Each stage tag refers to independently runnable source. Do not use a Stage 3 feature switch to represent Stage 1.
 
 - [stage-1](https://github.com/DevanshJ07/sc2002-restaurant-rush/tree/stage-1): Regular customers and core game.
-- Later stages will add customer behaviour, then Host/ComboMeal/Happy Hour.
+- [stage-2](https://github.com/DevanshJ07/sc2002-restaurant-rush/tree/stage-2): VIP (turn 4, 10% discount/loss 5) and Critic (turn 10, most expensive item/loss 12).
 
 The report, diagrams, recorded video timestamps and course declarations are maintained by the team separately; this repository does not claim those submission items are complete.
+

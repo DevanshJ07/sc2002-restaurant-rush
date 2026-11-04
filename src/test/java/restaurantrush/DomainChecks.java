@@ -65,6 +65,10 @@ public class DomainChecks {
         chefChecks();
         cashierChecks();
         lifecycleCheck();
+        summaryAndExit();
+    }
+
+    static void summaryAndExit() {
         System.out.println("Checks passed: " + passed + ", failed: " + failed);
         if (failed > 0) System.exit(1);
     }
