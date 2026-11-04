@@ -1,0 +1,41 @@
+no
+order 1
+cook 1
+no
+serve 1
+wait
+no
+wait
+wait
+no
+order 2
+cook 2
+yes
+serve 2
+wait
+wait
+wait
+order 1
+cook 1
+wait
+cook 1
+serve 1
+wait
+order 2
+cook 2
+wait
+cook 2
+wait
+cook 2
+serve 2
+wait
+order 1
+cook 1
+serve 1
+wait
+order 2
+cook 2
+serve 2
+wait
+wait
+wait
