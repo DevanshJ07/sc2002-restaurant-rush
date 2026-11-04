@@ -25,6 +25,7 @@ public class GameCLI {
             while (!controller.isGameOver()) {
                 controller.beginTurn();
                 displayTurnStatus();
+                promptHappyHour();
                 promptWaiterAction();
                 controller.finishWaiterPhase();
                 promptChefAction();
@@ -51,6 +52,10 @@ public class GameCLI {
                     + (t.isOccupied() ? describe(t.getCurrentCustomer()) : "free"));
         }
         System.out.println("Waiter: seat/order/serve or wait (one task). Chef: cook or wait (one unit).");
+        if (controller.hasPolicyManager()) {
+            System.out.println("Happy Hour: " + controller.getHappyHourRemainingTurns() + " active turns remaining | "
+                    + (controller.hasHappyHourBeenUsed() ? "activation used" : "activation available"));
+        }
         for (String event : controller.getTurnEvents()) { System.out.println("  " + event); }
     }
 
@@ -72,6 +77,22 @@ public class GameCLI {
                 System.out.println(controller.getTurnEvents().get(controller.getTurnEvents().size() - 1));
                 return;
             } catch (InvalidActionException | IllegalArgumentException e) { displayError(e.getMessage()); }
+        }
+    }
+
+    public void promptHappyHour() {
+        if (!controller.hasPolicyManager() || controller.hasHappyHourBeenUsed()) { return; }
+        while (true) {
+            System.out.print("Activate Happy Hour? [yes/no]: ");
+            String answer = scanner.nextLine().trim().toLowerCase(Locale.ROOT);
+            if (answer.equals("no") || answer.equals("n")) { return; }
+            if (answer.equals("yes") || answer.equals("y")) {
+                try {
+                    controller.activateHappyHour();
+                    System.out.println("Happy Hour active: " + controller.getHappyHourRemainingTurns() + " turns remaining.");
+                    return;
+                } catch (InvalidActionException e) { displayError(e.getMessage()); }
+            } else { displayError("Enter yes or no."); }
         }
     }
 

@@ -78,7 +78,8 @@ public final class IntegrationChecks {
         game.beginTurn(); end(game); check(game.getAbandonedCount() == 1, "Count departure once");
     }
     static void phases() throws Exception {
-        GameController game = Main.createGame();
+        Menu phaseMenu = new Menu(); phaseMenu.addItem(new MenuItem("Salad", 900, 1));
+        GameController game = custom(phaseMenu, new RegularCustomer(1));
         rejects(() -> game.waiterSeat(1, 1), "No action before begin");
         game.beginTurn(); rejects(game::beginTurn, "No duplicate arrivals");
         rejects(() -> game.chefAdvance(1), "Waiter first");
@@ -97,6 +98,11 @@ public final class IntegrationChecks {
         List<String> commands = new ArrayList<>();
         while (!game.isGameOver()) {
             game.beginTurn();
+            if (game.hasPolicyManager() && !game.hasHappyHourBeenUsed()) {
+                if (efficient && game.getCurrentTurn() == 5) {
+                    game.activateHappyHour(); commands.add("yes");
+                } else { commands.add("no"); }
+            }
             String command = "wait";
             if (efficient) {
                 Table target = game.getTables().stream().filter(t -> t.isOccupied()
@@ -145,7 +151,7 @@ public final class IntegrationChecks {
     }
     static void cliInvalidInput() throws Exception {
         GameController game = Main.createGame();
-        String output = cli(game, "nonsense\nseat abc 1\nseat 1 99\nseat 1 1\ncook 1\nwait\n");
+        String output = cli(game, "no\nnonsense\nseat abc 1\nseat 1 99\norder 99\norder 1\ncook 99\ncook 1\n");
         check(output.contains("Invalid choice") && output.contains("Session interrupted"), "Retry and EOF");
         check(game.getTurnsUsed() == 1 && game.getTables().get(0).isOccupied(), "Retry preserves successful action");
         check(!output.contains("VICTORY") && !output.contains("DEFEAT"), "EOF not a final result");

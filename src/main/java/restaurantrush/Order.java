@@ -57,6 +57,20 @@ public class Order {
         }
     }
 
+    /**
+     * Stage 3: reduce the locked bill by percentOff, rounded to the nearest cent.
+     * Only while IN_PROGRESS, so it can never reprice an order that is already cooked or served.
+     */
+    public void applyDiscount(int percentOff) throws InvalidActionException {
+        if (percentOff < 0 || percentOff > 100) {
+            throw new InvalidActionException("Discount must be between 0 and 100 percent.");
+        }
+        if (status != OrderStatus.IN_PROGRESS) {
+            throw new InvalidActionException("A discount can only be applied while the order is in progress.");
+        }
+        billInCents = (int) Math.round(billInCents * (100 - percentOff) / 100.0);
+    }
+
     public void markServed() throws InvalidActionException {
         if (status != OrderStatus.READY) {
             throw new InvalidActionException("The order is not ready to be served (it is " + describe() + ").");

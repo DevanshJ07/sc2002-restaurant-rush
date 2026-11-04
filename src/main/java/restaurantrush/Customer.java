@@ -107,6 +107,14 @@ public abstract class Customer {
         satisfaction = Math.max(0, satisfaction - getSatisfactionLossRate());
     }
 
+    /** Stage 3 Happy Hour: gain satisfaction, capped at 100. The controller decides who is eligible. */
+    public void recoverSatisfaction(int amount) {
+        if (amount < 0) {
+            throw new IllegalArgumentException("Recovery amount must not be negative");
+        }
+        satisfaction = Math.min(MAX_SATISFACTION, satisfaction + amount);
+    }
+
     /** SEATED + SERVED order -> EATING. */
     public void markServed(int turn) {
         if (state != CustomerState.SEATED) {

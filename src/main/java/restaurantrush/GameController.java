@@ -22,10 +22,19 @@ public class GameController {
     private final Cashier cashier;
     private final Menu menu;
     private final ArrivalSchedule arrivalSchedule;
+    private final Host host;
+    private final PolicyManager policyManager;
+    private boolean happyHourUsed;
     private final List<String> turnEvents = new ArrayList<>();
 
     public GameController(List<Table> tables, WaitingQueue waitingQueue, Waiter waiter,
                           Chef chef, Cashier cashier, Menu menu, ArrivalSchedule arrivalSchedule) {
+        this(tables, waitingQueue, waiter, chef, cashier, menu, arrivalSchedule, null, null);
+    }
+
+    public GameController(List<Table> tables, WaitingQueue waitingQueue, Waiter waiter,
+                          Chef chef, Cashier cashier, Menu menu, ArrivalSchedule arrivalSchedule,
+                          Host host, PolicyManager policyManager) {
         this.tables = List.copyOf(tables);
         this.waitingQueue = Objects.requireNonNull(waitingQueue);
         this.waiter = Objects.requireNonNull(waiter);
@@ -33,6 +42,8 @@ public class GameController {
         this.cashier = Objects.requireNonNull(cashier);
         this.menu = Objects.requireNonNull(menu);
         this.arrivalSchedule = Objects.requireNonNull(arrivalSchedule);
+        this.host = host;
+        this.policyManager = policyManager;
         if (this.tables.isEmpty() || menu.getItems().isEmpty()
                 || this.tables.stream().map(Table::getTableId).distinct().count() != this.tables.size()) {
             throw new IllegalArgumentException("Need a nonempty menu and uniquely identified tables");
@@ -45,12 +56,44 @@ public class GameController {
         }
         turnEvents.clear();
         waiter.resetForNewTurn(); chef.resetForNewTurn(); cashier.resetForNewTurn();
+        if (host != null) { host.resetForNewTurn(); }
         Customer arrival = arrivalSchedule.getArrivalFor(currentTurn);
         if (arrival != null) {
             waitingQueue.addCustomer(arrival);
             turnEvents.add(arrival + " arrived.");
         }
         phase = Phase.WAITER;
+        if (isHappyHourActive()) { recoverWaitingCustomers(); }
+        if (host != null) {
+            try {
+                Customer seated = host.seatNextCustomer(waitingQueue, tables);
+                if (seated != null) { turnEvents.add("Host seated " + seated + "."); }
+            } catch (InvalidActionException e) {
+                throw new IllegalStateException("Automatic Host encountered inconsistent state", e);
+            }
+        }
+    }
+
+    public void activateHappyHour() throws InvalidActionException {
+        requirePhase(Phase.WAITER);
+        if (policyManager == null || waiter.hasActedThisTurn()) {
+            throw new InvalidActionException("Happy Hour is available only before this turn's staff actions.");
+        }
+        policyManager.activateHappyHour();
+        happyHourUsed = true;
+        recoverWaitingCustomers();
+        turnEvents.add("Happy Hour activated for this turn and the next.");
+    }
+
+    private void recoverWaitingCustomers() {
+        List<Customer> customers = new ArrayList<>(waitingQueue.getCustomers());
+        for (Table table : tables) {
+            if (table.isOccupied()) { customers.add(table.getCurrentCustomer()); }
+        }
+        for (Customer c : customers) {
+            if (c.isWaiting()) { c.recoverSatisfaction(policyManager.getSatisfactionRecovery()); }
+        }
+        turnEvents.add("Happy Hour recovered waiting customers' satisfaction (maximum 100).");
     }
 
     public void waiterSeat(int customerId, int tableId) throws InvalidActionException {
@@ -66,6 +109,7 @@ public class GameController {
         requirePhase(Phase.WAITER);
         Customer customer = occupant(tableId);
         Order order = waiter.takeOrder(customer, menu);
+        if (policyManager != null) { policyManager.applyDiscount(order); }
         turnEvents.add(customer + " chose " + order.getMenuItem().getName()
                 + "; locked bill " + order.getBillInCents() + " cents.");
     }
@@ -114,6 +158,7 @@ public class GameController {
             Customer c = table.getCurrentCustomer();
             if (c != null && losePatience(c)) { table.freeTable(); }
         }
+        if (policyManager != null) { policyManager.decrementHappyHourTimer(); }
         currentTurn++;
         phase = Phase.BETWEEN_TURNS;
     }
@@ -161,6 +206,10 @@ public class GameController {
     public List<String> getTurnEvents() { return List.copyOf(turnEvents); }
     public boolean hasWaiterActedThisTurn() { return waiter.hasActedThisTurn(); }
     public boolean hasChefActedThisTurn() { return chef.hasActedThisTurn(); }
+    public boolean hasPolicyManager() { return policyManager != null; }
+    public boolean isHappyHourActive() { return policyManager != null && policyManager.isHappyHourActive(); }
+    public boolean hasHappyHourBeenUsed() { return happyHourUsed; }
+    public int getHappyHourRemainingTurns() { return policyManager == null ? 0 : policyManager.getRemainingTurns(); }
     public boolean isGameOver() { return currentTurn > MAX_TURNS; }
     public boolean isVictory() {
         return isGameOver() && meetsTargets(paidCustomerCount, totalRevenueInCents, paidSatisfactionTotal);
