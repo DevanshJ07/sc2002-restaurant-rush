@@ -9,8 +9,10 @@ public class ArrivalSchedule {
 
     public ArrivalSchedule(Map<Integer, Customer> arrivals) {
         this.arrivals = Map.copyOf(arrivals);
-        if (this.arrivals.keySet().stream().anyMatch(t -> t < 1 || t > 18)) {
-            throw new IllegalArgumentException("Arrival turn must be in 1..18");
+        for (int turn : this.arrivals.keySet()) {
+            if (turn < 1 || turn > 18) {
+                throw new IllegalArgumentException("Arrival turn must be in 1..18");
+            }
         }
     }
 

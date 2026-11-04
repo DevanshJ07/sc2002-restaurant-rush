@@ -44,9 +44,15 @@ public class GameController {
         this.arrivalSchedule = Objects.requireNonNull(arrivalSchedule);
         this.host = host;
         this.policyManager = policyManager;
-        if (this.tables.isEmpty() || menu.getItems().isEmpty()
-                || this.tables.stream().map(Table::getTableId).distinct().count() != this.tables.size()) {
+        if (this.tables.isEmpty() || menu.getItems().isEmpty()) {
             throw new IllegalArgumentException("Need a nonempty menu and uniquely identified tables");
+        }
+        for (int i = 0; i < this.tables.size(); i++) {
+            for (int j = i + 1; j < this.tables.size(); j++) {
+                if (this.tables.get(i).getTableId() == this.tables.get(j).getTableId()) {
+                    throw new IllegalArgumentException("Table IDs must be unique");
+                }
+            }
         }
     }
 
@@ -55,7 +61,9 @@ public class GameController {
             throw new IllegalStateException("Cannot begin this turn again or after the game ends");
         }
         turnEvents.clear();
-        waiter.resetForNewTurn(); chef.resetForNewTurn(); cashier.resetForNewTurn();
+        waiter.resetForNewTurn();
+        chef.resetForNewTurn();
+        cashier.resetForNewTurn();
         if (host != null) { host.resetForNewTurn(); }
         Customer arrival = arrivalSchedule.getArrivalFor(currentTurn);
         if (arrival != null) {
@@ -98,9 +106,16 @@ public class GameController {
 
     public void waiterSeat(int customerId, int tableId) throws InvalidActionException {
         requirePhase(Phase.WAITER);
-        Customer customer = waitingQueue.getCustomers().stream()
-                .filter(c -> c.getCustomerId() == customerId).findFirst()
-                .orElseThrow(() -> new InvalidActionException("No queued customer #" + customerId));
+        Customer customer = null;
+        for (Customer queuedCustomer : waitingQueue.getCustomers()) {
+            if (queuedCustomer.getCustomerId() == customerId) {
+                customer = queuedCustomer;
+                break;
+            }
+        }
+        if (customer == null) {
+            throw new InvalidActionException("No queued customer #" + customerId);
+        }
         waiter.seatCustomer(waitingQueue, customer, table(tableId));
         turnEvents.add(customer + " seated at table " + tableId + ".");
     }
@@ -181,8 +196,12 @@ public class GameController {
     }
 
     private Table table(int id) throws InvalidActionException {
-        return tables.stream().filter(t -> t.getTableId() == id).findFirst()
-                .orElseThrow(() -> new InvalidActionException("Unknown table #" + id));
+        for (Table table : tables) {
+            if (table.getTableId() == id) {
+                return table;
+            }
+        }
+        throw new InvalidActionException("Unknown table #" + id);
     }
 
     private Customer occupant(int id) throws InvalidActionException {

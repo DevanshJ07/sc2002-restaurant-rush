@@ -30,3 +30,7 @@ The scripts compile with --release 17; local execution used BlueJ's bundled Open
 Run scripts/build.ps1 -Test on Windows, or sh build-and-check.sh with a JDK on PATH. Tests fail with a nonzero process status. Stage-specific check output and replay results are recorded in STAGE_CHANGES.md.
 
 Final report, diagram export, video timestamps and signed declarations remain the team's separate submission responsibilities.
+
+## Readability follow-up
+
+After checking the supplied SC2002 syllabus outline, controller customer/table searches and duplicate-ID checks, plus arrival-turn validation, use ordinary for loops instead of stream/lambda chains. Existing OOP responsibilities, public APIs, game behaviour and stage release snapshots are preserved. No extra framework or design pattern was introduced. This refactoring applies to the current main branch; the stage tags remain the original verified development snapshots.

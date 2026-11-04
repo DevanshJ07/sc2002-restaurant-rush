@@ -27,6 +27,8 @@ java -cp out restaurantrush.Main
 
 No Maven, Gradle, external dependency or network connection is required.
 
+Core game logic uses ordinary loops and conditionals, classes/objects, abstract classes, inheritance, overriding, enums, collections and exception handling. The controller's small phase enum enforces turn order; it is not a separate framework. Read-only collection copies prevent callers from changing internal lists. Test helpers are separate from the game source.
+
 ## Play
 
 The menu is Salad ($9, 1 preparation unit), Burger ($15, 1), Pasta ($18, 2). Customers choose food by `(customerId - 1) mod menu size`. The manager chooses priorities, not dishes.
