@@ -2,6 +2,7 @@ package restaurantrush;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 /** Coordinates turns; staff/domain objects retain their own rules. No console I/O. */
@@ -136,8 +137,8 @@ public class GameController {
         Customer customer = occupant(tableId);
         Order order = waiter.takeOrder(customer, menu);
         if (policyManager != null) { policyManager.applyDiscount(order); }
-        turnEvents.add(customer + " chose " + order.getMenuItem().getName()
-                + "; locked bill " + order.getBillInCents() + " cents.");
+        turnEvents.add(String.format(Locale.ROOT, "%s chose %s; locked bill $%.2f.",
+                customer, order.getMenuItem().getName(), order.getBillInCents() / 100.0));
     }
 
     public void waiterServe(int tableId) throws InvalidActionException {
@@ -175,7 +176,8 @@ public class GameController {
             totalRevenueInCents += paid.getOrder().getBillInCents();
             paidSatisfactionTotal += paid.getSatisfaction();
             paidCustomerCount++;
-            turnEvents.add(paid + " paid " + paid.getOrder().getBillInCents() + " cents; table freed.");
+            turnEvents.add(String.format(Locale.ROOT, "%s paid $%.2f; table freed.",
+                    paid, paid.getOrder().getBillInCents() / 100.0));
         }
         for (Customer c : new ArrayList<>(waitingQueue.getCustomers())) {
             if (losePatience(c)) { waitingQueue.removeCustomer(c); }
