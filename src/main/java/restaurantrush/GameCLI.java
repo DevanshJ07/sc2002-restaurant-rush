@@ -23,8 +23,9 @@ public class GameCLI {
         }
         try {
             while (!controller.isGameOver()) {
-                controller.beginTurn();
                 displayTurnStatus();
+                controller.beginTurn();
+                displayArrivalUpdates();
                 promptHappyHour();
                 promptWaiterAction();
                 controller.finishWaiterPhase();
@@ -44,6 +45,22 @@ public class GameCLI {
         System.out.printf(Locale.ROOT, "%nTURN %d / 18 | revenue %s | paid %d | average %s%n",
                 controller.getCurrentTurn(), money(controller.getRevenueInCents()),
                 controller.getPaidCustomerCount(), average());
+        displayQueueAndTables();
+        System.out.println("Waiter: seat/order/serve or wait (one task). Chef: cook or wait (one unit).");
+        if (controller.hasPolicyManager()) {
+            System.out.println("Happy Hour: " + controller.getHappyHourRemainingTurns() + " active turns remaining | "
+                    + (controller.hasHappyHourBeenUsed() ? "activation used" : "activation available"));
+        }
+    }
+
+    private void displayArrivalUpdates() {
+        if (controller.getTurnEvents().isEmpty()) { return; }
+        System.out.println("Turn opening updates:");
+        for (String event : controller.getTurnEvents()) { System.out.println("  " + event); }
+        displayQueueAndTables();
+    }
+
+    private void displayQueueAndTables() {
         System.out.println("Queue:");
         if (controller.getWaitingQueue().isEmpty()) { System.out.println("  empty"); }
         for (Customer c : controller.getWaitingQueue().getCustomers()) { System.out.println("  " + describe(c)); }
@@ -51,12 +68,6 @@ public class GameCLI {
             System.out.println("Table " + t.getTableId() + ": "
                     + (t.isOccupied() ? describe(t.getCurrentCustomer()) : "free"));
         }
-        System.out.println("Waiter: seat/order/serve or wait (one task). Chef: cook or wait (one unit).");
-        if (controller.hasPolicyManager()) {
-            System.out.println("Happy Hour: " + controller.getHappyHourRemainingTurns() + " active turns remaining | "
-                    + (controller.hasHappyHourBeenUsed() ? "activation used" : "activation available"));
-        }
-        for (String event : controller.getTurnEvents()) { System.out.println("  " + event); }
     }
 
     public void promptWaiterAction() {

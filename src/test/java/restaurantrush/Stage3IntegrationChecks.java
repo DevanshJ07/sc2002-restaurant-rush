@@ -23,6 +23,14 @@ public final class Stage3IntegrationChecks {
         String output = IntegrationChecks.cli(Main.createGame(), "maybe\nyes\norder 1\ncook 1\n");
         check(output.contains("Enter yes or no") && output.contains("2 turns remaining")
                 && output.contains("1 active turns remaining"), "Activation input and duration display");
+        int openingTable = output.indexOf("Table 1: free");
+        int arrival = output.indexOf("Regular #1 arrived.");
+        int hostSeating = output.indexOf("Host seated Regular #1.");
+        int updatedTable = output.indexOf("Table 1: Regular #1");
+        int waiterPrompt = output.indexOf("Waiter [");
+        check(openingTable >= 0 && openingTable < arrival && arrival < hostSeating
+                && hostSeating < updatedTable && updatedTable < waiterPrompt,
+                "Show opening state before arrivals, then Host update before Waiter input");
         System.out.println("Stage 3 integration checks passed: " + checks);
     }
     private static void recoveryAndPricing() throws Exception {

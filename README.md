@@ -41,6 +41,8 @@ Stage 2 replaces turn-4's arrival with VIP (loss 5, 10% discount) and turn-10's 
 
 At turn start, answer `yes` or `no` to Happy Hour activation. It can activate once, lasts the current turn and next, recovers waiting satisfaction by 15 each active turn (maximum 100), and discounts orders taken during those turns by 20% after any VIP discount. Bills already placed never change. The remaining duration is displayed. Once activated, the activation question stops appearing.
 
+The turn opens with a status display before arrivals. Any arrival, automatic seating or ongoing Happy Hour recovery is then reported with the updated queue and tables before you choose staff actions.
+
 ## Reproduce results
 
 After building, replay the checked-in inputs using PowerShell:
