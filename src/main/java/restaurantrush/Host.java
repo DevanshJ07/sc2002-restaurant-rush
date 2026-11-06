@@ -3,7 +3,7 @@ package restaurantrush;
 import java.util.List;
 
 /**
- * Host: automatically seats the head of the queue at the lowest-ID free table, once per turn.
+ * Host: when asked, seats the head of the queue at the lowest-ID free table, once per turn.
  * Independent of the Waiter: it never uses the Waiter's action.
  */
 public class Host extends Staff {

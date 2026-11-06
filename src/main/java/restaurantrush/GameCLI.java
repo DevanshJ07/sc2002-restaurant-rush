@@ -27,6 +27,10 @@ public class GameCLI {
                 controller.beginTurn();
                 displayArrivalUpdates();
                 promptHappyHour();
+                if (controller.hasHost()) {
+                    promptHostAction();
+                    controller.finishHostPhase();
+                }
                 promptWaiterAction();
                 controller.finishWaiterPhase();
                 promptChefAction();
@@ -46,6 +50,7 @@ public class GameCLI {
                 controller.getCurrentTurn(), money(controller.getRevenueInCents()),
                 controller.getPaidCustomerCount(), average());
         displayQueueAndTables();
+        if (controller.hasHost()) { System.out.println("Host: seat the next queued customer or wait (one task)."); }
         System.out.println("Waiter: seat/order/serve or wait (one task). Chef: cook or wait (one unit).");
         if (controller.hasPolicyManager()) {
             System.out.println("Happy Hour: " + controller.getHappyHourRemainingTurns() + " active turns remaining | "
@@ -67,6 +72,22 @@ public class GameCLI {
         for (Table t : controller.getTables()) {
             System.out.println("Table " + t.getTableId() + ": "
                     + (t.isOccupied() ? describe(t.getCurrentCustomer()) : "free"));
+        }
+    }
+
+    public void promptHostAction() {
+        while (true) {
+            System.out.print("Host [seat | wait]: ");
+            String[] parts = readParts();
+            try {
+                requireLength(parts, 1);
+                if (parts[0].equals("wait")) { return; }
+                if (!parts[0].equals("seat")) { throw new IllegalArgumentException("Choose seat or wait."); }
+                controller.hostSeat();
+                System.out.println(controller.getTurnEvents().get(controller.getTurnEvents().size() - 1));
+                displayQueueAndTables();
+                return;
+            } catch (InvalidActionException | IllegalArgumentException e) { displayError(e.getMessage()); }
         }
     }
 

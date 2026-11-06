@@ -1,41 +1,59 @@
 no
+seat
 order 1
 cook 1
 no
+wait
 serve 1
 wait
 no
 wait
 wait
+wait
 no
+seat
 order 2
 cook 2
 yes
+wait
 serve 2
 wait
+wait
+wait
+wait
+seat
+order 1
+cook 1
+wait
+wait
+cook 1
+wait
+serve 1
+wait
+seat
+order 2
+cook 2
+wait
+wait
+cook 2
+wait
+wait
+cook 2
+seat
+serve 2
 wait
 wait
 order 1
 cook 1
 wait
-cook 1
 serve 1
 wait
+seat
 order 2
 cook 2
 wait
-cook 2
-wait
-cook 2
 serve 2
 wait
-order 1
-cook 1
-serve 1
-wait
-order 2
-cook 2
-serve 2
 wait
 wait
 wait

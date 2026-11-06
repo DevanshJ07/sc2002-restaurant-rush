@@ -37,11 +37,11 @@ At each turn enter one Waiter command: `seat <customerId> <tableId>`, `order <ta
 
 There are two tables and six arrivals on turns 1, 4, 7, 10, 13 and 16. The game always runs 18 turns. Victory requires at least 4 paid customers AND $45 revenue AND average paid satisfaction at least 60. Regular customers lose 8 satisfaction each unserved waiting turn. Unpaid customers leave at zero. Serving, eating and payment happen on separate turns; tables free only at payment or abandonment.
 
-Stage 2 replaces turn-4's arrival with VIP (loss 5, 10% discount) and turn-10's with Critic (loss 12, chooses most expensive item). Stage 3 adds an automatic Host who seats one queue-head customer at the lowest-ID free table before manager choices, independently of Waiter. The menu appends Salad + Pasta Combo ($24.30, 3 units).
+Stage 2 replaces turn-4's arrival with VIP (loss 5, 10% discount) and turn-10's with Critic (loss 12, chooses most expensive item). Stage 3 adds a player-controlled Host. At the Host prompt, enter `seat` to seat the next queued customer at the lowest-ID free table, or `wait` to skip. The Waiter still gets a separate action and can still seat customers. The menu appends Salad + Pasta Combo ($24.30, 3 units).
 
 At turn start, answer `yes` or `no` to Happy Hour activation. It can activate once, lasts the current turn and next, recovers waiting satisfaction by 15 each active turn (maximum 100), and discounts orders taken during those turns by 20% after any VIP discount. Bills already placed never change. The remaining duration is displayed. Once activated, the activation question stops appearing.
 
-The turn opens with a status display before arrivals. Any arrival, automatic seating or ongoing Happy Hour recovery is then reported with the updated queue and tables before you choose staff actions.
+The turn opens with a status display before arrivals. Arrivals and ongoing Happy Hour recovery are then reported with the updated queue and tables. After the Happy Hour decision, choose the Host action, then the Waiter action, then the Chef action. No customer is seated without a player command.
 
 ## Reproduce results
 
@@ -64,11 +64,11 @@ Each stage tag refers to independently runnable source. Do not use a Stage 3 fea
 
 - [stage-1](https://github.com/DevanshJ07/sc2002-restaurant-rush/tree/stage-1): Regular customers and core game.
 - [stage-2](https://github.com/DevanshJ07/sc2002-restaurant-rush/tree/stage-2): VIP (turn 4, 10% discount/loss 5) and Critic (turn 10, most expensive item/loss 12).
-- [stage-3](https://github.com/DevanshJ07/sc2002-restaurant-rush/tree/stage-3): automatic Host, ComboMeal, Happy Hour.
+- [stage-3](https://github.com/DevanshJ07/sc2002-restaurant-rush/tree/stage-3): original Stage 3 snapshot (automatic Host), ComboMeal and Happy Hour.
+- [stage-3-player-host](https://github.com/DevanshJ07/sc2002-restaurant-rush/tree/stage-3-player-host): updated Stage 3 snapshot with player-controlled Host.
 
 To inspect an earlier version without changing your current files, clone the repository separately with `git clone --branch stage-1 https://github.com/DevanshJ07/sc2002-restaurant-rush.git restaurant-rush-stage1` (substitute stage-2 as needed). Each tag includes its own appropriate replay inputs and check runners.
 
 Stage changes: [1 to 2](https://github.com/DevanshJ07/sc2002-restaurant-rush/compare/stage-1...stage-2), [2 to 3](https://github.com/DevanshJ07/sc2002-restaurant-rush/compare/stage-2...stage-3). See [docs/IMPLEMENTATION_NOTES.md](docs/IMPLEMENTATION_NOTES.md) for integration details and additions to v3's API.
 
 The report, diagrams, recorded video timestamps and course declarations are maintained by the team separately; this repository does not claim those submission items are complete.
-

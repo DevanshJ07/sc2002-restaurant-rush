@@ -19,7 +19,7 @@ Update the final class/sequence diagrams to match these public operations and Ma
 
 ## Timing and pricing
 
-Waiter runs before Chef. beginTurn handles arrivals, ongoing recovery and automatic Host. New Happy Hour activation happens after the initial display and before manager staff decisions; its recovery applies immediately. Recovery only targets isWaiting customers. finishTurn advances eating, collects one previously eligible payment, applies waiting loss/abandonment, then decrements policy duration and advances the turn.
+Waiter runs before Chef. beginTurn handles arrivals and ongoing recovery. New Happy Hour activation happens before staff decisions; its recovery applies immediately. The CLI then asks the player for the Host decision, if a Host is present. The controller closes the Host phase before the Waiter phase. Recovery only targets isWaiting customers. finishTurn advances eating, collects one previously eligible payment, applies waiting loss/abandonment, then decrements policy duration and advances the turn.
 
 Waiter.takeOrder asks the Customer to choose and calculates that customer's bill. Controller immediately calls PolicyManager.applyDiscount on the returned order once. It never discounts an order during later turns, even if it remains IN_PROGRESS. Payment reads the stored bill rather than recomputing a price. No timer or recovery loop lives in the CLI.
 

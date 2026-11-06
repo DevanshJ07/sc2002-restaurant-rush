@@ -20,36 +20,48 @@ public final class Stage3IntegrationChecks {
     public static void main(String[] args) throws Exception {
         recoveryAndPricing(); oldOrder(); hostIndependence(); lateActivation();
         check(Main.createGame().getMenuItems().get(3).getPriceInCents() == 2430, "Combo registration");
-        String output = IntegrationChecks.cli(Main.createGame(), "maybe\nyes\norder 1\ncook 1\n");
+        String output = IntegrationChecks.cli(Main.createGame(), "maybe\nyes\nseat\norder 1\ncook 1\n");
         check(output.contains("Enter yes or no") && output.contains("2 turns remaining")
                 && output.contains("1 active turns remaining"), "Activation input and duration display");
         int openingTable = output.indexOf("Table 1: free");
         int arrival = output.indexOf("Regular #1 arrived.");
+        int queued = output.indexOf("state=QUEUED");
+        int hostPrompt = output.indexOf("Host [");
         int hostSeating = output.indexOf("Host seated Regular #1.");
         int updatedTable = output.indexOf("Table 1: Regular #1");
         int waiterPrompt = output.indexOf("Waiter [");
-        check(openingTable >= 0 && openingTable < arrival && arrival < hostSeating
+        check(openingTable >= 0 && openingTable < arrival && arrival < queued
+                && queued < hostPrompt && hostPrompt < hostSeating
                 && hostSeating < updatedTable && updatedTable < waiterPrompt,
                 "Show opening state before arrivals, then Host update before Waiter input");
+        GameController skipped = Main.createGame();
+        IntegrationChecks.cli(skipped, "no\nwait\nwait\nwait\n");
+        check(skipped.getWaitingQueue().getQueueSize() == 1
+                && !skipped.getTables().get(0).isOccupied(), "Host wait leaves the arrival queued");
+        GameController waiterSeats = Main.createGame();
+        IntegrationChecks.cli(waiterSeats, "no\nwait\nseat 1 1\nwait\n");
+        check(waiterSeats.getTables().get(0).isOccupied(), "Waiter can still seat after Host waits");
         System.out.println("Stage 3 integration checks passed: " + checks);
     }
     private static void recoveryAndPricing() throws Exception {
         Customer vip = new VIPCustomer(2); GameController g = game(vip, new Host("H"));
         IntegrationChecks.rejects(g::activateHappyHour, "No activation before turn");
-        g.beginTurn(); check(vip.getState() == CustomerState.SEATED && !g.hasWaiterActedThisTurn(), "Host independent");
+        g.beginTurn(); g.hostSeat(); g.finishHostPhase();
+        check(vip.getState() == CustomerState.SEATED && !g.hasWaiterActedThisTurn(), "Host independent");
         IntegrationChecks.end(g); check(vip.getSatisfaction() == 95, "Unserved VIP loss");
-        g.beginTurn(); IntegrationChecks.end(g); check(vip.getSatisfaction() == 90, "Two waiting turns");
+        g.beginTurn(); g.finishHostPhase(); IntegrationChecks.end(g); check(vip.getSatisfaction() == 90, "Two waiting turns");
         g.beginTurn(); g.activateHappyHour(); check(vip.getSatisfaction() == 100, "Recovery caps");
         IntegrationChecks.rejects(g::activateHappyHour, "No repeated activation/recovery");
         check(vip.getSatisfaction() == 100 && g.getHappyHourRemainingTurns() == 2, "Failed activation atomic");
-        g.waiterTakeOrder(1); check(vip.getOrder().getBillInCents() == 1080, "VIP then Happy Hour");
+        g.finishHostPhase(); g.waiterTakeOrder(1); check(vip.getOrder().getBillInCents() == 1080, "VIP then Happy Hour");
         g.finishWaiterPhase(); g.finishTurn(); check(vip.getSatisfaction() == 95, "Loss still occurs at end");
         g.beginTurn(); check(vip.getSatisfaction() == 100 && g.getHappyHourRemainingTurns() == 1, "Next active turn recovery");
-        g.finishWaiterPhase(); g.chefAdvance(1); g.finishTurn();
+        g.finishHostPhase(); g.finishWaiterPhase(); g.chefAdvance(1); g.finishTurn();
         check(g.getHappyHourRemainingTurns() == 0 && vip.getSatisfaction() == 95, "Expiry after two turns");
         g.beginTurn(); check(vip.getSatisfaction() == 95, "No third recovery");
-        g.waiterServe(1); IntegrationChecks.end(g);
-        g.beginTurn(); IntegrationChecks.end(g); g.beginTurn(); IntegrationChecks.end(g);
+        g.finishHostPhase(); g.waiterServe(1); IntegrationChecks.end(g);
+        g.beginTurn(); g.finishHostPhase(); IntegrationChecks.end(g);
+        g.beginTurn(); g.finishHostPhase(); IntegrationChecks.end(g);
         check(vip.getState() == CustomerState.PAID && g.getRevenueInCents() == 1080
                 && g.getAverageSatisfaction() == 95, "Discounted real payment and recorded satisfaction");
         g.beginTurn(); IntegrationChecks.rejects(g::activateHappyHour, "Cannot reactivate after expiry");
@@ -63,26 +75,33 @@ public final class Stage3IntegrationChecks {
     }
     private static void oldOrder() throws Exception {
         Customer c = new RegularCustomer(1); GameController g = game(c, new Host("H"));
-        g.beginTurn(); g.waiterTakeOrder(1);
+        g.beginTurn(); g.hostSeat(); g.finishHostPhase(); g.waiterTakeOrder(1);
         IntegrationChecks.rejects(g::activateHappyHour, "Cannot activate after staff action");
         IntegrationChecks.end(g); g.beginTurn(); g.activateHappyHour();
         check(c.getOrder().getBillInCents() == 1500, "Old IN_PROGRESS bill not repriced");
-        g.finishWaiterPhase(); g.chefAdvance(1); g.finishTurn();
-        g.beginTurn(); g.waiterServe(1); IntegrationChecks.end(g);
+        g.finishHostPhase(); g.finishWaiterPhase(); g.chefAdvance(1); g.finishTurn();
+        g.beginTurn(); g.finishHostPhase(); g.waiterServe(1); IntegrationChecks.end(g);
         check(c.getOrder().getBillInCents() == 1500, "Old bill stays locked through serving");
         Customer eating = new RegularCustomer(1); g = game(eating, new Host("H"));
-        g.beginTurn(); g.waiterTakeOrder(1); g.finishWaiterPhase(); g.chefAdvance(1); g.finishTurn();
-        g.beginTurn(); g.waiterServe(1); IntegrationChecks.end(g); int satisfaction = eating.getSatisfaction();
+        g.beginTurn(); g.hostSeat(); g.finishHostPhase(); g.waiterTakeOrder(1);
+        g.finishWaiterPhase(); g.chefAdvance(1); g.finishTurn();
+        g.beginTurn(); g.finishHostPhase(); g.waiterServe(1); IntegrationChecks.end(g); int satisfaction = eating.getSatisfaction();
         g.beginTurn(); g.activateHappyHour(); check(eating.getSatisfaction() == satisfaction, "No EATING recovery");
-        IntegrationChecks.end(g); g.beginTurn(); check(eating.getSatisfaction() == satisfaction, "No READY_TO_PAY recovery");
-        IntegrationChecks.end(g); check(eating.getSatisfaction() == satisfaction, "No paid recovery");
+        g.finishHostPhase(); IntegrationChecks.end(g); g.beginTurn();
+        check(eating.getSatisfaction() == satisfaction, "No READY_TO_PAY recovery");
+        g.finishHostPhase(); IntegrationChecks.end(g); check(eating.getSatisfaction() == satisfaction, "No paid recovery");
     }
     private static void hostIndependence() throws Exception {
         WaitingQueue q = new WaitingQueue(); q.addCustomer(new RegularCustomer(1)); q.addCustomer(new RegularCustomer(2));
         Table t1 = new Table(1), t2 = new Table(2);
         GameController g = new GameController(List.of(t2, t1), q, new Waiter("W"), new Chef("C"), new Cashier("K"),
                 menu(), new ArrivalSchedule(Map.of()), new Host("H"), new PolicyManager());
-        g.beginTurn(); check(t1.isOccupied() && !t2.isOccupied() && q.getQueueSize() == 1, "Host chooses lowest ID, seats only one");
+        g.beginTurn();
+        check(!t1.isOccupied() && !t2.isOccupied() && q.getQueueSize() == 2, "Host never seats during beginTurn");
+        g.hostSeat();
+        IntegrationChecks.rejects(g::hostSeat, "Host cannot seat twice in a turn");
+        check(t1.isOccupied() && !t2.isOccupied() && q.getQueueSize() == 1, "Host chooses lowest ID, seats only one");
+        g.finishHostPhase();
         g.waiterSeat(2, 2); check(t2.isOccupied() && q.isEmpty(), "Waiter seats another independently");
     }
     private static void lateActivation() throws Exception {

@@ -7,7 +7,7 @@ import java.util.Objects;
 /** Coordinates turns; staff/domain objects retain their own rules. No console I/O. */
 public class GameController {
     public static final int MAX_TURNS = 18;
-    private enum Phase { BETWEEN_TURNS, WAITER, CHEF }
+    private enum Phase { BETWEEN_TURNS, HOST, WAITER, CHEF }
     private Phase phase = Phase.BETWEEN_TURNS;
     private int currentTurn = 1;
     private int paidCustomerCount;
@@ -70,21 +70,32 @@ public class GameController {
             waitingQueue.addCustomer(arrival);
             turnEvents.add(arrival + " arrived.");
         }
-        phase = Phase.WAITER;
+        phase = host == null ? Phase.WAITER : Phase.HOST;
         if (isHappyHourActive()) { recoverWaitingCustomers(); }
-        if (host != null) {
-            try {
-                Customer seated = host.seatNextCustomer(waitingQueue, tables);
-                if (seated != null) { turnEvents.add("Host seated " + seated + "."); }
-            } catch (InvalidActionException e) {
-                throw new IllegalStateException("Automatic Host encountered inconsistent state", e);
-            }
+    }
+
+    public void hostSeat() throws InvalidActionException {
+        requirePhase(Phase.HOST);
+        if (host.hasActedThisTurn()) {
+            throw new InvalidActionException("The Host has already seated a customer this turn.");
         }
+        Customer seated = host.seatNextCustomer(waitingQueue, tables);
+        if (seated == null) {
+            throw new InvalidActionException(waitingQueue.isEmpty()
+                    ? "No customers are waiting in the queue." : "No tables are free.");
+        }
+        turnEvents.add("Host seated " + seated + ".");
+    }
+
+    public void finishHostPhase() throws InvalidActionException {
+        requirePhase(Phase.HOST);
+        phase = Phase.WAITER;
     }
 
     public void activateHappyHour() throws InvalidActionException {
-        requirePhase(Phase.WAITER);
-        if (policyManager == null || waiter.hasActedThisTurn()) {
+        requirePhase(host == null ? Phase.WAITER : Phase.HOST);
+        if (policyManager == null || waiter.hasActedThisTurn()
+                || (host != null && host.hasActedThisTurn())) {
             throw new InvalidActionException("Happy Hour is available only before this turn's staff actions.");
         }
         policyManager.activateHappyHour();
@@ -226,6 +237,7 @@ public class GameController {
     public boolean hasWaiterActedThisTurn() { return waiter.hasActedThisTurn(); }
     public boolean hasChefActedThisTurn() { return chef.hasActedThisTurn(); }
     public boolean hasPolicyManager() { return policyManager != null; }
+    public boolean hasHost() { return host != null; }
     public boolean isHappyHourActive() { return policyManager != null && policyManager.isHappyHourActive(); }
     public boolean hasHappyHourBeenUsed() { return happyHourUsed; }
     public int getHappyHourRemainingTurns() { return policyManager == null ? 0 : policyManager.getRemainingTurns(); }

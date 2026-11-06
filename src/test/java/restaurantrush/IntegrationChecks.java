@@ -104,6 +104,14 @@ public final class IntegrationChecks {
                 } else { commands.add("no"); }
             }
             String command = "wait";
+            if (game.hasHost()) {
+                if (efficient && !game.getWaitingQueue().isEmpty()
+                        && game.getTables().stream().anyMatch(t -> !t.isOccupied())) {
+                    game.hostSeat();
+                    commands.add("seat");
+                } else { commands.add("wait"); }
+                game.finishHostPhase();
+            }
             if (efficient) {
                 Table target = game.getTables().stream().filter(t -> t.isOccupied()
                         && t.getCurrentCustomer().getOrder() != null && t.getCurrentCustomer().getOrder().isReady())
@@ -151,7 +159,7 @@ public final class IntegrationChecks {
     }
     static void cliInvalidInput() throws Exception {
         GameController game = Main.createGame();
-        String output = cli(game, "no\nnonsense\nseat abc 1\nseat 1 99\norder 99\norder 1\ncook 99\ncook 1\n");
+        String output = cli(game, "no\nwrong\nseat\nnonsense\nseat abc 1\nseat 1 99\norder 99\norder 1\ncook 99\ncook 1\n");
         check(output.contains("Invalid choice") && output.contains("Session interrupted"), "Retry and EOF");
         check(game.getTurnsUsed() == 1 && game.getTables().get(0).isOccupied(), "Retry preserves successful action");
         check(!output.contains("VICTORY") && !output.contains("DEFEAT"), "EOF not a final result");
