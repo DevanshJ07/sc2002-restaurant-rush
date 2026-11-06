@@ -1,74 +1,89 @@
-# SC2002 Restaurant Rush
+# Restaurant Rush
 
-Group 4's offline Java CLI restaurant-management game, following the approved Refined Class Design v3 and assignment brief. The default branch is the complete **Stage 3** game.
+SC2002 Group 4’s offline, turn-based restaurant management game. The player manages staff priorities through a Java command-line interface. Customers choose their own food; the player decides whom to seat, whose order to take, what to cook, and when to serve.
 
-## Run on Windows
+**Run the current Stage 3 game from `main`.** The Host now takes a player command before the Waiter. Customers join the queue first and stay there until the Host or Waiter seats them.
 
-Requires a JDK 17 or newer. Set JAVA_HOME to your JDK directory or put its bin directory on PATH. The PowerShell scripts also recognise BlueJ's bundled JDK on this machine.
+## Build and run
 
-```powershell
+Use **JDK 17 or newer**. The game needs no external Java libraries, build framework, or network connection once the source is downloaded.
+
+~~~bash
+git clone https://github.com/DevanshJ07/sc2002-restaurant-rush.git
+cd sc2002-restaurant-rush
+~~~
+
+From the repository folder on **Windows**, launch the game or run the checks:
+
+~~~powershell
 powershell -ExecutionPolicy Bypass -File scripts/run.ps1
-```
-
-Compile and run all checks:
-
-```powershell
 powershell -ExecutionPolicy Bypass -File scripts/build.ps1 -Test
-```
+~~~
 
-On macOS/Linux or Git Bash with a JDK on PATH, run `sh build-and-check.sh`, then `java -cp out restaurantrush.Main`.
+The scripts look for a JDK through `JAVA_HOME` or `PATH` and can also use BlueJ’s bundled JDK at its default Windows location.
 
-Manual build (all platforms):
+On **macOS or Linux**, with the JDK on `PATH`:
 
-```text
-javac --release 17 -d out src/main/java/restaurantrush/*.java
+~~~sh
+sh build-and-check.sh
 java -cp out restaurantrush.Main
-```
+~~~
 
-No Maven, Gradle, external dependency or network connection is required.
+## How to play
 
-Core game logic uses ordinary loops and conditionals, classes/objects, abstract classes, inheritance, overriding, enums, collections and exception handling. The controller's small phase enum enforces turn order; it is not a separate framework. Read-only collection copies prevent callers from changing internal lists. Test helpers are separate from the game source.
+The game runs for **18 turns** with two tables and arrivals on turns **1, 4, 7, 10, 13 and 16**. To win, finish with **at least 4 paid customers, $45.00 in revenue, and an average paid-customer satisfaction of 60 or more**. All three targets must be met. Revenue and the satisfaction average count payments only; the average shows `N/A` before the first payment.
 
-## Play
+### Turn order in the current build
 
-The menu is Salad ($9, 1 preparation unit), Burger ($15, 1), Pasta ($18, 2). Customers choose food by `(customerId - 1) mod menu size`. The manager chooses priorities, not dishes.
+1. Read the opening status. Then the scheduled customer arrives, and the game shows the updated queue and tables before asking for actions.
+2. If Happy Hour is still available, enter `yes` to activate it or `no` to save it.
+3. **Host:** enter `seat` to seat the first queued customer at the lowest-numbered free table, or `wait` to skip. This prompt does not take customer or table IDs.
+4. **Waiter:** enter `seat <customerId> <tableId>`, `order <tableId>`, `serve <tableId>`, or `wait`. The Waiter gets a separate action even if the Host seats someone.
+5. **Chef:** enter `cook <tableId>` to advance an order by one preparation unit, or `wait`.
+6. Eating, eligible payments, satisfaction loss and departures are handled at the end of the turn. A dish finished by the Chef can be served on a later turn. A customer who finishes eating can pay on a later turn. The Cashier handles at most one eligible payment per turn, oldest first.
 
-At each turn enter one Waiter command: `seat <customerId> <tableId>`, `order <tableId>`, `serve <tableId>`, or `wait`. Then enter `cook <tableId>` or `wait` for Chef. Invalid actions explain the problem and let you retry. Customer/table IDs are displayed. Cashier acts automatically.
+Invalid input is explained and you can retry without using up the action. Customers waiting for a table or food lose satisfaction each turn. At zero, they leave without paying, and any unfinished order is cancelled.
 
-There are two tables and six arrivals on turns 1, 4, 7, 10, 13 and 16. The game always runs 18 turns. Victory requires at least 4 paid customers AND $45 revenue AND average paid satisfaction at least 60. Regular customers lose 8 satisfaction each unserved waiting turn. Unpaid customers leave at zero. Serving, eating and payment happen on separate turns; tables free only at payment or abandonment.
+**Try turn 1:** type `no` at Happy Hour, `seat` at Host, `order 1` at Waiter, then `cook 1` at Chef. The Salad is now `READY`. On turn 2, choose `no` for Happy Hour, `wait` for Host, `serve 1` for Waiter, and `wait` for Chef.
 
-Stage 2 replaces turn-4's arrival with VIP (loss 5, 10% discount) and turn-10's with Critic (loss 12, chooses most expensive item). Stage 3 adds a player-controlled Host. At the Host prompt, enter `seat` to seat the next queued customer at the lowest-ID free table, or `wait` to skip. The Waiter still gets a separate action and can still seat customers. The menu appends Salad + Pasta Combo ($24.30, 3 units).
+### Menu and customer behaviour
 
-At turn start, answer `yes` or `no` to Happy Hour activation. It can activate once, lasts the current turn and next, recovers waiting satisfaction by 15 each active turn (maximum 100), and discounts orders taken during those turns by 20% after any VIP discount. Bills already placed never change. The remaining duration is displayed. Once activated, the activation question stops appearing.
+The base menu is Salad (**$9.00**, 1 preparation unit), Burger (**$15.00**, 1 unit), and Pasta (**$18.00**, 2 units). Stage 3 adds a Salad + Pasta Combo (**$24.30**, 3 units). Regular and VIP customers choose the menu item at zero-based index `(customerId - 1) % menu size`. Critics choose the most expensive item, with the first item winning a tie. Stage 2 and later have a VIP on turn 4 and a Critic on turn 10.
 
-The turn opens with a status display before arrivals. Arrivals and ongoing Happy Hour recovery are then reported with the updated queue and tables. After the Happy Hour decision, choose the Host action, then the Waiter action, then the Chef action. No customer is seated without a player command.
+Regular customers lose 8 satisfaction per waiting turn. VIP customers lose 5 and receive a 10% discount. Critics lose 12 and pay full price before any Happy Hour discount.
 
-## Reproduce results
+Happy Hour can be activated once per game, for the current turn and the next. Eligible waiting customers recover 15 satisfaction at the start of each active turn, capped at 100. New orders get 20% off **after** any VIP discount; earlier bills stay locked. A VIP Burger ordered during Happy Hour costs **$10.80**. Money is stored in integer cents and shown in dollars to two decimals.
 
-After building, replay the checked-in inputs using PowerShell:
+## Replay and test
 
-```powershell
-Get-Content examples/victory.txt | & 'C:/Program Files/BlueJ/jdk/bin/java.exe' -cp out restaurantrush.Main
-Get-Content examples/defeat.txt | & 'C:/Program Files/BlueJ/jdk/bin/java.exe' -cp out restaurantrush.Main
-```
+Use the replay file from the **same branch or tag** as the game. The current Stage 3 files include a Host decision every turn. In PowerShell, build first and then run:
 
-Replace the Java executable path with your JDK's path as needed. On macOS/Linux: `java -cp out restaurantrush.Main < examples/victory.txt` (likewise for defeat).
+~~~powershell
+powershell -ExecutionPolicy Bypass -File scripts/build.ps1 -Test
+Get-Content examples/victory.txt | java -cp out restaurantrush.Main
+Get-Content examples/defeat.txt | java -cp out restaurantrush.Main
+~~~
 
-Verified Stage 3 victory: 5 paid, $73.80, average 84.80, 18 turns (Happy Hour activated on turn 5). Defeat (decline Happy Hour and Wait throughout): 0 paid, $0.00, average N/A, 18 turns. `IntegrationChecks` replays both through the actual CLI. The test strategy is a deterministic test helper; it is not an automatic player in production. Tests also check the six-turn Regular Pasta example (payment satisfaction 76), invalid choices, timing, abandonment, victory boundaries, VIP/Critic behaviour, independent Host actions and Happy Hour boundaries.
+If `java` is not on your `PATH`, replace it with `& 'C:/Program Files/BlueJ/jdk/bin/java.exe'` or the path to your JDK’s Java executable. On macOS or Linux, use `java -cp out restaurantrush.Main < examples/victory.txt` and substitute `defeat.txt` for the defeat replay.
 
-## Ownership and stage history
+- **Victory replay:** 5 paid customers, $73.80 revenue, 84.80 average satisfaction, 18 turns.
+- **Defeat replay:** 0 paid customers, $0.00 revenue, N/A average satisfaction, 18 turns.
 
-ZN supplied the domain/staff classes and domain checks in a ZIP handoff. Devansh's implementation adds controller, CLI, setup, arrivals and integration checks. See [CODING_PLAN.md](CODING_PLAN.md) for the agreed split and [docs/STAGE_CHANGES.md](docs/STAGE_CHANGES.md) for transition evidence.
+The repository checks cover invalid actions, staff limits, preparation and payment timing, abandonment, victory thresholds, customer types, Host choices, and Happy Hour. The current build also matched an independent rules model across 72 full games, 1,296 turns, and 15,857 rejected inputs.
 
-Each stage tag refers to independently runnable source. Do not use a Stage 3 feature switch to represent Stage 1.
+## Stage history
 
-- [stage-1](https://github.com/DevanshJ07/sc2002-restaurant-rush/tree/stage-1): Regular customers and core game.
-- [stage-2](https://github.com/DevanshJ07/sc2002-restaurant-rush/tree/stage-2): VIP (turn 4, 10% discount/loss 5) and Critic (turn 10, most expensive item/loss 12).
-- [stage-3](https://github.com/DevanshJ07/sc2002-restaurant-rush/tree/stage-3): original Stage 3 snapshot (automatic Host), ComboMeal and Happy Hour.
-- [stage-3-player-host](https://github.com/DevanshJ07/sc2002-restaurant-rush/tree/stage-3-player-host): updated Stage 3 snapshot with player-controlled Host.
+Each tagged snapshot is independently runnable. To play a particular stage separately, use `git clone --branch <tag> https://github.com/DevanshJ07/sc2002-restaurant-rush.git <new-folder>`. Stage 1 and Stage 2 have no Host: use `seat 1 1` at the first Waiter prompt.
 
-To inspect an earlier version without changing your current files, clone the repository separately with `git clone --branch stage-1 https://github.com/DevanshJ07/sc2002-restaurant-rush.git restaurant-rush-stage1` (substitute stage-2 as needed). Each tag includes its own appropriate replay inputs and check runners.
+- [stage-1](https://github.com/DevanshJ07/sc2002-restaurant-rush/tree/stage-1): Regular customers and the complete base game.
+- [stage-2](https://github.com/DevanshJ07/sc2002-restaurant-rush/tree/stage-2): adds VIP and Critic customers.
+- [stage-3](https://github.com/DevanshJ07/sc2002-restaurant-rush/tree/stage-3): original Stage 3 snapshot with automatic Host seating.
+- [stage-3-player-host](https://github.com/DevanshJ07/sc2002-restaurant-rush/tree/stage-3-player-host): revised Stage 3 snapshot with a player-controlled Host. Use `main` for that behaviour plus the later currency display fix.
 
-Stage changes: [1 to 2](https://github.com/DevanshJ07/sc2002-restaurant-rush/compare/stage-1...stage-2), [2 to 3](https://github.com/DevanshJ07/sc2002-restaurant-rush/compare/stage-2...stage-3). See [docs/IMPLEMENTATION_NOTES.md](docs/IMPLEMENTATION_NOTES.md) for integration details and additions to v3's API.
+[Stage 1 → Stage 2](https://github.com/DevanshJ07/sc2002-restaurant-rush/compare/stage-1...stage-2) adds the VIP and Critic classes and tests, and updates the menu lookup and arrival schedule. [Stage 2 → current Stage 3](https://github.com/DevanshJ07/sc2002-restaurant-rush/compare/stage-2...main) adds Host, ComboMeal, PolicyManager and their tests, and updates setup, customer recovery, order pricing, turn coordination, prompts and replay inputs. No production classes were removed in either transition. See [stage change notes](docs/STAGE_CHANGES.md) for details.
 
-The report, diagrams, recorded video timestamps and course declarations are maintained by the team separately; this repository does not claim those submission items are complete.
+## Source and demo notes
+
+The Java source is in [src/main/java/restaurantrush](src/main/java/restaurantrush), with tests in [src/test/java/restaurantrush](src/test/java/restaurantrush). Devansh implemented the controller, CLI, setup and arrivals and integrated the stages. ZN supplied the domain and staff classes and their checks. See the [implementation notes](docs/IMPLEMENTATION_NOTES.md) for the code structure and diagram handoff.
+
+For the recorded demo, use the current examples and show the Host choice separately from the Waiter action. The earlier Word guide was written for the automatic Host version, so its command list needs the extra Host input. Add the video link and actual segment timestamps here after recording.
