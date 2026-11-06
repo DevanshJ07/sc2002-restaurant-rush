@@ -28,11 +28,11 @@ ZN's supplied production code required no behavioural fixes. Additional controll
 
 Validation: 105 core + 17 Stage 2 + 41 Stage 3 domain checks, 74 general integration checks, Stage 2 integration scenarios, 27 Stage 3 integration checks (with additional exception-boundary assertions). Actual CLI victory: 5 paid/$73.80/84.80 average, 18 turns, Happy Hour turn 5. Defeat: 0 paid/$0/N/A, 18 turns.
 
-[Compare stage-2 to stage-3](https://github.com/DevanshJ07/sc2002-restaurant-rush/compare/stage-2...stage-3).
+[Compare stage-2 to the original Stage 3 commit](https://github.com/DevanshJ07/sc2002-restaurant-rush/compare/stage-2...e0ec925728901763da5cb6c593f530f57ec013fb).
 
 ## Stage 3 player controlled Host
 
-The original stage-3 tag preserves the Refined v3 automatic Host snapshot. The stage-3-player-host tag contains the updated Stage 3 game. The first status display precedes arrivals; after arrivals, customers remain queued until the player chooses to seat them. The Host prompt accepts seat or wait before the separate Waiter and Chef choices. Host still selects the queue head and the lowest-ID free table.
+The original automatic Host snapshot remains in Git history at commit e0ec925. The stage-3-player-host tag contains the revised Stage 3 game. The first status display precedes arrivals; after arrivals, customers remain queued until the player chooses to seat them. The Host prompt accepts seat or wait before the separate Waiter and Chef choices. Host still selects the queue head and the lowest-ID free table.
 
 Diagram handoff: add GameCLI.promptHostAction(), GameController.hostSeat(), finishHostPhase() and hasHost() to the Stage 3 class diagram. In the sequence diagram show CLI prompting for seat or wait, calling hostSeat only on seat, then closing the Host phase before Waiter. The Host domain signature is unchanged.
 

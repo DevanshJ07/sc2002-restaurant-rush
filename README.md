@@ -77,7 +77,6 @@ Each tagged snapshot is independently runnable. To play a particular stage separ
 
 - [stage-1](https://github.com/DevanshJ07/sc2002-restaurant-rush/tree/stage-1): Regular customers and the complete base game.
 - [stage-2](https://github.com/DevanshJ07/sc2002-restaurant-rush/tree/stage-2): adds VIP and Critic customers.
-- [stage-3](https://github.com/DevanshJ07/sc2002-restaurant-rush/tree/stage-3): original Stage 3 snapshot with automatic Host seating.
 - [stage-3-player-host](https://github.com/DevanshJ07/sc2002-restaurant-rush/tree/stage-3-player-host): revised Stage 3 snapshot with a player-controlled Host. Use `main` for that behaviour plus the later currency display fix.
 
 [Stage 1 → Stage 2](https://github.com/DevanshJ07/sc2002-restaurant-rush/compare/stage-1...stage-2) adds the VIP and Critic classes and tests, and updates the menu lookup and arrival schedule. [Stage 2 → current Stage 3](https://github.com/DevanshJ07/sc2002-restaurant-rush/compare/stage-2...main) adds Host, ComboMeal, PolicyManager and their tests, and updates setup, customer recovery, order pricing, turn coordination, prompts and replay inputs. No production classes were removed in either transition. See [stage change notes](docs/STAGE_CHANGES.md) for details.
