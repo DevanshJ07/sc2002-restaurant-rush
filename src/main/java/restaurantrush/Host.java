@@ -30,7 +30,8 @@ public class Host extends Staff {
         }
         Customer customer = queue.getNextCustomer();
         if (customer.getState() != CustomerState.QUEUED) {
-            throw new InvalidActionException("Inconsistent state: queue head " + customer.getCustomerId() + " is not QUEUED.");
+            // Only QUEUED customers can enter the queue, so this would be a bug, not a player mistake.
+            throw new IllegalStateException("Queue head " + customer.getCustomerId() + " is not QUEUED.");
         }
         queue.removeCustomer(customer);
         target.assignCustomer(customer);

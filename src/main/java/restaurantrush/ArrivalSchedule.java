@@ -3,7 +3,10 @@ package restaurantrush;
 import java.util.HashMap;
 import java.util.Map;
 
-/** Deterministic arrivals; the factory is the only Stage 2 registration change. */
+/**
+ * Which customer arrives on which turn. Fixed, so every run of the base setting is reproducible.
+ * A new customer type only needs to be registered in createBaseSchedule(); nothing else changes.
+ */
 public class ArrivalSchedule {
     private final Map<Integer, Customer> arrivals;
 
@@ -26,5 +29,8 @@ public class ArrivalSchedule {
         return new ArrivalSchedule(arrivals);
     }
 
-    public Customer getArrivalFor(int turn) { return arrivals.get(turn); }
+    /** The customer arriving at the start of this turn, or null if nobody arrives. */
+    public Customer getArrivalFor(int turn) {
+        return arrivals.get(turn);
+    }
 }

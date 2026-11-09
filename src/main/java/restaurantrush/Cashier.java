@@ -36,8 +36,8 @@ public class Cashier extends Staff {
         Customer customer = chosenTable.getCurrentCustomer();
         Order order = customer.getOrder();
         if (order == null || order.getStatus() != OrderStatus.SERVED) {
-            throw new InvalidActionException("Inconsistent state: customer " + customer.getCustomerId()
-                    + " has no served order to pay.");
+            // READY_TO_PAY is only reachable after serving, so this would be a bug, not a player mistake.
+            throw new IllegalStateException("Customer " + customer.getCustomerId() + " has no served order to pay.");
         }
         order.markPaid();
         customer.setState(CustomerState.PAID);

@@ -4,7 +4,10 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-/** FIFO line of customers waiting for a table (renamed from Queue to avoid java.util.Queue). */
+/**
+ * First-in, first-out line of customers waiting for a table.
+ * Named WaitingQueue so it is not confused with java.util.Queue.
+ */
 public class WaitingQueue {
     private final LinkedList<Customer> waitingCustomers = new LinkedList<>();
 
@@ -16,7 +19,8 @@ public class WaitingQueue {
             throw new IllegalArgumentException("Customer must not be null");
         }
         if (customer.getState() != CustomerState.QUEUED) {
-            throw new IllegalStateException("Only a QUEUED customer can join the queue (state " + customer.getState() + ")");
+            throw new IllegalStateException(
+                    "Only a QUEUED customer can join the queue (state " + customer.getState() + ")");
         }
         for (Customer c : waitingCustomers) {
             if (c == customer || c.getCustomerId() == customer.getCustomerId()) {
