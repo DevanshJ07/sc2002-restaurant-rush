@@ -154,7 +154,19 @@ public abstract class Customer {
     // ---- subclass hooks (polymorphism) ----
     public abstract int getSatisfactionLossRate();
 
-    public abstract int calculateBill(int baseCents);
+    /**
+     * Template method: the shared price check happens here once, then each customer type
+     * applies its own pricing rule. It is final so no subclass can skip the check.
+     */
+    public final int calculateBill(int baseCents) {
+        if (baseCents < 0) {
+            throw new IllegalArgumentException("Price must not be negative");
+        }
+        return applyPricing(baseCents);
+    }
+
+    /** The customer type's own pricing rule, given a price that is already known to be valid. */
+    protected abstract int applyPricing(int baseCents);
 
     public abstract String getTypeLabel();
 
