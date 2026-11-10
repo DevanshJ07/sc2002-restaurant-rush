@@ -33,7 +33,8 @@ public class Waiter extends Staff {
         }
         requireNotActed();
         if (customer.getState() != CustomerState.SEATED) {
-            throw new InvalidActionException("Customer " + customer.getCustomerId() + " is not seated, so cannot order.");
+            throw new InvalidActionException(
+                    "Customer " + customer.getCustomerId() + " is not seated, so cannot order.");
         }
         if (customer.getOrder() != null) {
             throw new InvalidActionException("Customer " + customer.getCustomerId() + " has already ordered.");
