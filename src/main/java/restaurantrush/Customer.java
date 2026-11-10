@@ -55,32 +55,33 @@ public abstract class Customer {
     // ---- guarded state changes ----
 
     /**
-     * Allowed here: QUEUED->SEATED, QUEUED/SEATED->ABANDONED, READY_TO_PAY->PAID.
-     * EATING and READY_TO_PAY carry a turn stamp, so they only come from
-     * markServed() / markReadyToPay().
+     * Each life-cycle step has its own method, so callers say what happens ("seat", "pay")
+     * instead of picking a state. EATING and READY_TO_PAY also need a turn stamp, so they
+     * only come from markServed() / markReadyToPay().
      */
-    public void setState(CustomerState newState) {
-        if (newState == null) {
-            throw new IllegalArgumentException("State must not be null");
+    public void seat() {
+        requireState(CustomerState.SEATED, CustomerState.QUEUED);
+        state = CustomerState.SEATED;
+    }
+
+    /** Leaves without paying: only possible while still waiting for a table or for food. */
+    public void abandon() {
+        requireState(CustomerState.ABANDONED, CustomerState.QUEUED, CustomerState.SEATED);
+        state = CustomerState.ABANDONED;
+    }
+
+    public void pay() {
+        requireState(CustomerState.PAID, CustomerState.READY_TO_PAY);
+        state = CustomerState.PAID;
+    }
+
+    private void requireState(CustomerState target, CustomerState... allowedFrom) {
+        for (CustomerState allowed : allowedFrom) {
+            if (state == allowed) {
+                return;
+            }
         }
-        boolean legal;
-        switch (newState) {
-            case SEATED:
-                legal = state == CustomerState.QUEUED;
-                break;
-            case ABANDONED:
-                legal = state == CustomerState.QUEUED || state == CustomerState.SEATED;
-                break;
-            case PAID:
-                legal = state == CustomerState.READY_TO_PAY;
-                break;
-            default:
-                legal = false;
-        }
-        if (!legal) {
-            throw new IllegalStateException("Illegal customer transition " + state + " -> " + newState);
-        }
-        state = newState;
+        throw new IllegalStateException("Illegal customer transition " + state + " -> " + target);
     }
 
     /** Attach the order once. Only a seated customer can have one. */

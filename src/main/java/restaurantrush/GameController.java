@@ -219,7 +219,7 @@ public class GameController {
         if (customer.getOrder() != null) {
             customer.getOrder().cancel();
         }
-        customer.setState(CustomerState.ABANDONED);
+        customer.abandon();
         stats.recordAbandoned();
         turnEvents.add(customer + " left unhappy without paying.");
         return true;

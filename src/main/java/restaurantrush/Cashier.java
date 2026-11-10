@@ -40,7 +40,7 @@ public class Cashier extends Staff {
             throw new IllegalStateException("Customer " + customer.getCustomerId() + " has no served order to pay.");
         }
         order.markPaid();
-        customer.setState(CustomerState.PAID);
+        customer.pay();
         chosenTable.freeTable();
         markActed();
         return customer;
