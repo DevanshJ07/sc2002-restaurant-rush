@@ -37,3 +37,14 @@ The original automatic Host snapshot remains in Git history at commit e0ec925. T
 Diagram handoff: add GameCLI.promptHostAction(), GameController.hostSeat(), finishHostPhase() and hasHost() to the Stage 3 class diagram. In the sequence diagram show CLI prompting for seat or wait, calling hostSeat only on seat, then closing the Host phase before Waiter. The Host domain signature is unchanged.
 
 The Stage 3 replay files include one additional Host input per turn. The earlier Word guide describes the original automatic Host replay; use the updated README and example inputs when demonstrating this version.
+
+## Final refactor after Stage 3
+
+Behaviour-preserving changes made after the stage tags, so the stage tags still show each stage as it was delivered.
+
+Cleanup: consistent formatting and comments; Host and Cashier throw IllegalStateException for states that can only come from a programming error, while InvalidActionException stays for player mistakes; GameCLI uses GameController.MAX_TURNS instead of a hard-coded 18.
+New: GameStats (score counting and the victory rule, previously inside GameController).
+Changed: Customer.calculateBill() is a final template method that validates the price once and calls the subtype's applyPricing(); Customer.setState() is replaced by seat(), abandon() and pay(); Waiter, Host, Cashier and GameController call these instead. GameController's public methods are unchanged, so GameCLI needed no change for the refactor.
+Diagrams: the Stage 3 class diagram and the sequence diagram are updated to this final code (GameStats class and lifeline, applyPricing(), seat()/pay()).
+
+Validation: all existing checks still pass with the same counts; both replay files and 150 randomised games produce output identical to the stage-3-player-host build.

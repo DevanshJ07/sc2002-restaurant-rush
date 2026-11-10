@@ -146,7 +146,7 @@ public class DomainChecks {
         // isWaiting per state
         Customer w = new RegularCustomer(3);
         check("QUEUED is waiting", w.isWaiting());
-        w.setState(CustomerState.SEATED);
+        w.seat();
         check("SEATED is waiting", w.isWaiting());
         Order o = new Order(new MenuItem("Salad", 900, 1), 900);
         w.setOrder(o);
@@ -159,23 +159,27 @@ public class DomainChecks {
         w.markReadyToPay(5);
         check("READY_TO_PAY is not waiting, turn stamped", !w.isWaiting() && w.getReadyToPayTurn() == 5);
         o.markPaid();
-        w.setState(CustomerState.PAID);
+        w.pay();
         check("PAID is not waiting", !w.isWaiting());
         Customer a = new RegularCustomer(4);
-        a.setState(CustomerState.ABANDONED);
+        a.abandon();
         check("ABANDONED is not waiting", !a.isWaiting());
 
         // guards
-        expectThrows("ABANDONED -> SEATED illegal", IllegalStateException.class, () -> a.setState(CustomerState.SEATED));
-        expectThrows("QUEUED -> EATING via setState illegal", IllegalStateException.class, () -> new RegularCustomer(5).setState(CustomerState.EATING));
-        expectThrows("QUEUED -> PAID illegal", IllegalStateException.class, () -> new RegularCustomer(5).setState(CustomerState.PAID));
-        expectThrows("null state rejected", IllegalArgumentException.class, () -> new RegularCustomer(5).setState(null));
+        expectThrows("ABANDONED -> SEATED illegal", IllegalStateException.class, () -> a.seat());
+        expectThrows("PAID customer cannot abandon", IllegalStateException.class, () -> w.abandon());
+        expectThrows("QUEUED -> PAID illegal", IllegalStateException.class, () -> new RegularCustomer(5).pay());
+        expectThrows("seating twice rejected", IllegalStateException.class, () -> {
+            Customer twice = new RegularCustomer(5);
+            twice.seat();
+            twice.seat();
+        });
         expectThrows("setOrder while queued rejected", IllegalStateException.class,
                 () -> new RegularCustomer(5).setOrder(new Order(new MenuItem("S", 1, 1), 1)));
         expectThrows("second order rejected", IllegalStateException.class, () -> w.setOrder(new Order(new MenuItem("S", 1, 1), 1)));
         expectThrows("markServed when queued rejected", IllegalStateException.class, () -> new RegularCustomer(6).markServed(1));
         Customer s = new RegularCustomer(6);
-        s.setState(CustomerState.SEATED);
+        s.seat();
         s.setOrder(new Order(new MenuItem("S", 1, 1), 1));
         expectThrows("markServed before order SERVED rejected", IllegalStateException.class, () -> s.markServed(1));
     }
@@ -189,7 +193,7 @@ public class DomainChecks {
         check("FIFO peek does not remove", q.getNextCustomer() == c1 && q.getQueueSize() == 2);
         expectThrows("duplicate add rejected", IllegalStateException.class, () -> q.addCustomer(c1));
         Customer seatedOne = new RegularCustomer(3);
-        seatedOne.setState(CustomerState.SEATED);
+        seatedOne.seat();
         expectThrows("non-QUEUED add rejected", IllegalStateException.class, () -> q.addCustomer(seatedOne));
         expectThrows("queue view unmodifiable", UnsupportedOperationException.class, () -> q.getCustomers().remove(0));
         check("removeCustomer true then false", q.removeCustomer(c1) && !q.removeCustomer(c1));
@@ -269,7 +273,7 @@ public class DomainChecks {
     static Customer readyToPay(int id, Table table, int servedTurn, int readyTurn) throws Exception {
         Customer c = new RegularCustomer(id);
         table.assignCustomer(c);
-        c.setState(CustomerState.SEATED);
+        c.seat();
         Order o = new Order(new MenuItem("Salad", 900, 1), 900);
         c.setOrder(o);
         o.decrementPrepUnit();

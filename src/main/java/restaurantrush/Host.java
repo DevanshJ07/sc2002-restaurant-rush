@@ -35,7 +35,7 @@ public class Host extends Staff {
         }
         queue.removeCustomer(customer);
         target.assignCustomer(customer);
-        customer.setState(CustomerState.SEATED);
+        customer.seat();
         markActed();
         return customer;
     }

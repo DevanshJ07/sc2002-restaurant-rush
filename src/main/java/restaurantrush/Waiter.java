@@ -23,7 +23,7 @@ public class Waiter extends Staff {
         // all checks passed: now change state
         queue.removeCustomer(customer);
         table.assignCustomer(customer);
-        customer.setState(CustomerState.SEATED);
+        customer.seat();
         markActed();
     }
 

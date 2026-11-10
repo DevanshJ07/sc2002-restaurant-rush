@@ -89,10 +89,10 @@ public final class IntegrationChecks {
         rejects(game::finishTurn, "No duplicate finish");
     }
     static void thresholds() {
-        check(GameController.meetsTargets(4, 4500, 240), "Exact victory boundary");
-        check(!GameController.meetsTargets(3, 4500, 240), "Paid threshold");
-        check(!GameController.meetsTargets(4, 4499, 240), "Revenue threshold");
-        check(!GameController.meetsTargets(4, 4500, 239), "Average threshold unrounded");
+        check(GameStats.meetsTargets(4, 4500, 240), "Exact victory boundary");
+        check(!GameStats.meetsTargets(3, 4500, 240), "Paid threshold");
+        check(!GameStats.meetsTargets(4, 4499, 240), "Revenue threshold");
+        check(!GameStats.meetsTargets(4, 4500, 239), "Average threshold unrounded");
     }
     static String play(GameController game, boolean efficient) throws Exception {
         List<String> commands = new ArrayList<>();

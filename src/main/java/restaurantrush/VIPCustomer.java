@@ -12,10 +12,7 @@ public class VIPCustomer extends Customer {
     }
 
     @Override
-    public int calculateBill(int baseCents) {
-        if (baseCents < 0) {
-            throw new IllegalArgumentException("Price must not be negative");
-        }
+    protected int applyPricing(int baseCents) {
         // multiply first (exact int), divide once as a double, then round half up
         return (int) Math.round(baseCents * 90 / 100.0);
     }

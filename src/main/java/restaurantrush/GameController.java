@@ -15,11 +15,7 @@ public class GameController {
     private enum Phase { BETWEEN_TURNS, HOST, WAITER, CHEF }
     private Phase phase = Phase.BETWEEN_TURNS;
     private int currentTurn = 1;
-    private int paidCustomerCount;
-    private int totalRevenueInCents;
-    private int paidSatisfactionTotal;
-    private int servedCount;
-    private int abandonedCount;
+    private final GameStats stats = new GameStats();
     private final List<Table> tables;
     private final WaitingQueue waitingQueue;
     private final Waiter waiter;
@@ -162,7 +158,7 @@ public class GameController {
         requirePhase(Phase.WAITER);
         Customer customer = occupant(tableId);
         waiter.serveOrder(customer, currentTurn);
-        servedCount++;
+        stats.recordServed();
         turnEvents.add(customer + " served; now eating.");
     }
 
@@ -190,9 +186,7 @@ public class GameController {
         }
         Customer paid = cashier.collectPayment(tables, currentTurn);
         if (paid != null) {
-            totalRevenueInCents += paid.getOrder().getBillInCents();
-            paidSatisfactionTotal += paid.getSatisfaction();
-            paidCustomerCount++;
+            stats.recordPayment(paid.getOrder().getBillInCents(), paid.getSatisfaction());
             turnEvents.add(String.format(Locale.ROOT, "%s paid $%.2f; table freed.",
                     paid, paid.getOrder().getBillInCents() / 100.0));
         }
@@ -225,8 +219,8 @@ public class GameController {
         if (customer.getOrder() != null) {
             customer.getOrder().cancel();
         }
-        customer.setState(CustomerState.ABANDONED);
-        abandonedCount++;
+        customer.abandon();
+        stats.recordAbandoned();
         turnEvents.add(customer + " left unhappy without paying.");
         return true;
     }
@@ -263,23 +257,23 @@ public class GameController {
     }
 
     public int getRevenueInCents() {
-        return totalRevenueInCents;
+        return stats.getRevenueInCents();
     }
 
     public int getPaidCustomerCount() {
-        return paidCustomerCount;
+        return stats.getPaidCustomerCount();
     }
 
     public int getServedCount() {
-        return servedCount;
+        return stats.getServedCount();
     }
 
     public int getAbandonedCount() {
-        return abandonedCount;
+        return stats.getAbandonedCount();
     }
 
     public double getAverageSatisfaction() {
-        return paidCustomerCount == 0 ? 0 : (double) paidSatisfactionTotal / paidCustomerCount;
+        return stats.getAverageSatisfaction();
     }
 
     public List<Table> getTables() {
@@ -331,11 +325,6 @@ public class GameController {
     }
 
     public boolean isVictory() {
-        return isGameOver() && meetsTargets(paidCustomerCount, totalRevenueInCents, paidSatisfactionTotal);
-    }
-
-    /** Victory needs all three targets: at least 4 paid, at least $45.00 revenue and an average of 60 or more. */
-    static boolean meetsTargets(int paid, int cents, int satisfactionTotal) {
-        return paid >= 4 && cents >= 4500 && satisfactionTotal >= 60L * paid;
+        return isGameOver() && stats.meetsTargets();
     }
 }

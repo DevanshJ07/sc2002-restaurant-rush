@@ -12,10 +12,7 @@ public class RegularCustomer extends Customer {
     }
 
     @Override
-    public int calculateBill(int baseCents) {
-        if (baseCents < 0) {
-            throw new IllegalArgumentException("Price must not be negative");
-        }
+    protected int applyPricing(int baseCents) {
         return baseCents;
     }
 
