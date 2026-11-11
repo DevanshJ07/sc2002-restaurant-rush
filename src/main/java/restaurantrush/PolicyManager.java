@@ -33,6 +33,10 @@ public class PolicyManager {
         }
     }
 
+    public boolean hasBeenUsed() {
+        return happyHourHasBeenUsed;
+    }
+
     public boolean isHappyHourActive() {
         return happyHourRemainingTurns > 0;
     }

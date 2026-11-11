@@ -25,7 +25,6 @@ public class GameController {
     private final ArrivalSchedule arrivalSchedule;
     private final Host host;
     private final PolicyManager policyManager;
-    private boolean happyHourUsed;
     private final List<String> turnEvents = new ArrayList<>();
 
     /** Core game without a Host or Happy Hour (the Stage 1 and Stage 2 setup). */
@@ -107,7 +106,6 @@ public class GameController {
                     "Happy Hour is available only before this turn's staff actions.");
         }
         policyManager.activateHappyHour();
-        happyHourUsed = true;
         recoverWaitingCustomers();
         turnEvents.add("Happy Hour activated for this turn and the next.");
     }
@@ -296,10 +294,6 @@ public class GameController {
         return waiter.hasActedThisTurn();
     }
 
-    public boolean hasChefActedThisTurn() {
-        return chef.hasActedThisTurn();
-    }
-
     public boolean hasPolicyManager() {
         return policyManager != null;
     }
@@ -313,7 +307,7 @@ public class GameController {
     }
 
     public boolean hasHappyHourBeenUsed() {
-        return happyHourUsed;
+        return policyManager != null && policyManager.hasBeenUsed();
     }
 
     public int getHappyHourRemainingTurns() {
