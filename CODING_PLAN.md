@@ -1,3 +1,5 @@
+> **Historical document.** This is the plan written before implementation started. The delivered code and diagrams supersede it where they differ; see README.md and docs/STAGE_CHANGES.md.
+
 # Restaurant Rush coding plan for Devansh and ZN
 
 This handoff is intended for both coders and their AI assistants. Build the Java CLI game required by the assignment brief, following the approved Refined Class Design v3. The brief governs mandatory behaviour; v3 governs the agreed design. Earlier Google Doc/v2 material is historical where it disagrees.

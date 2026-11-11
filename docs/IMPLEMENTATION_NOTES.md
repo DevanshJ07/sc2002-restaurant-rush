@@ -13,7 +13,7 @@ ZN's domain production source is imported from the supplied three-stage ZIP with
 - GameController's internal phase guards reject duplicate begin/finish calls and post-game actions. Staff flags enforce their own one-action limits.
 - Controller exposes a copied event list, menu items and policy-presence/display getters for the CLI. Collections are read-only; staff/domain objects still own their behaviour.
 - Stage 3 retains the Stage 1 constructor for focused core-flow tests, delegating to the extended constructor with no Host/policy. Production Main always supplies both. This is not used to represent the earlier stage releases; their actual source is preserved at tags.
-- PolicyManager derives active status from remaining duration, as supplied by ZN. Controller records successful activation for the display getter.
+- PolicyManager derives active status from remaining duration, as supplied by ZN. It is also the only record of whether Happy Hour has been used (hasBeenUsed()); the controller's display getter asks it.
 
 Update the final class/sequence diagrams to match these public operations and Main's actual setup wiring. Objects are constructed in Main and handed to GameController for the game lifetime; do not claim that GameController constructs every part itself.
 
@@ -30,6 +30,10 @@ The scripts compile with --release 17; local execution used BlueJ's bundled Open
 Run scripts/build.ps1 -Test on Windows, or sh build-and-check.sh with a JDK on PATH. Tests fail with a nonzero process status. Stage-specific check output and replay results are recorded in STAGE_CHANGES.md.
 
 Final report, diagram export, video timestamps and signed declarations remain the team's separate submission responsibilities.
+
+## Final refactor
+
+After the stage tags, the team made a behaviour-preserving SOLID refactor on main (template method for billing, GameStats, seat()/abandon()/pay(), a single Happy Hour usage record). The Stage 3 class and sequence diagrams were updated to match. See the "Final refactor after Stage 3" section of [STAGE_CHANGES.md](STAGE_CHANGES.md).
 
 ## Readability follow-up
 
