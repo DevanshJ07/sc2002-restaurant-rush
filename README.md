@@ -4,6 +4,8 @@ SC2002 Group 4’s offline, turn-based restaurant management game. The player ma
 
 **Run the current Stage 3 game from `main`.** The Host now takes a player command before the Waiter. Customers join the queue first and stay there until the Host or Waiter seats them.
 
+**Demo video:** [https://www.youtube.com/watch?v=y8gwKpnKHsA](https://www.youtube.com/watch?v=y8gwKpnKHsA)
+
 ## Build and run
 
 Use **JDK 17 or newer**. The game needs no external Java libraries, build framework, or network connection once the source is downloaded.
