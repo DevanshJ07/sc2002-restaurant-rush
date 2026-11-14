@@ -127,4 +127,14 @@ Each tagged snapshot is independently runnable. To play a particular stage separ
 
 The Java source is in [src/main/java/restaurantrush](src/main/java/restaurantrush), with tests in [src/test/java/restaurantrush](src/test/java/restaurantrush). Devansh implemented the controller, CLI, setup and arrivals and integrated the stages. ZN supplied the domain and staff classes and their checks. Braden drew the class and sequence diagrams (the `.drawio` files in the repository root). Minh wrote the documentation, reviewed the code against SOLID and made the final refactor. See the [implementation notes](docs/IMPLEMENTATION_NOTES.md) for the code structure and diagram handoff.
 
-For the recorded demo, use the current examples and show the Host choice separately from the Waiter action. The earlier Word guide was written for the automatic Host version, so its command list needs the extra Host input. Add the video link and actual segment timestamps here after recording.
+| # | Brief requirements | Start time | Presenter |
+|:-:|-------------------------------|:----------:|-----------|
+| 1 | The game launching from the submitted project | 4.06 | Devansh |
+| 2 | Meaningful manager choices, including a decision where staff are constrained | 5.37 | Devansh |
+| 3 | A dish going READY → SERVED → payment | 4.35 | Devansh |
+| 4 | A VIP or Critic behaviour (VIP 10% pricing discount) | 5.15 | Devansh |
+| 5 | A Stage 3 feature (Host action) | 4.22 | Devansh |
+| 6 | One victory and one defeat | 9.37 (V), 10.00 (D) | Zheng Ning |
+| 7 | The stage tag comparisons and the diagrams | 12.00 | Braden |
+
+Video link: https://www.youtube.com/watch?v=y8gwKpnKHsA
