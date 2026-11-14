@@ -135,6 +135,7 @@ The Java source is in [src/main/java/restaurantrush](src/main/java/restaurantrus
 | 4 | A VIP or Critic behaviour (VIP 10% pricing discount) | 5.15 | Devansh |
 | 5 | A Stage 3 feature (Host action) | 4.22 | Devansh |
 | 6 | One victory and one defeat | 9.37 (V), 10.00 (D) | Zheng Ning |
-| 7 | The stage tag comparisons and the diagrams | 12.00 | Braden |
+| 7 | The stage tag comparisons | 1.19 | Minh |
+| 8 | The Diagrams | 12.00 | Braden |
 
 Video link: https://www.youtube.com/watch?v=y8gwKpnKHsA
