@@ -77,9 +77,49 @@ Each tagged snapshot is independently runnable. To play a particular stage separ
 
 - [stage-1](https://github.com/DevanshJ07/sc2002-restaurant-rush/tree/stage-1): Regular customers and the complete base game.
 - [stage-2](https://github.com/DevanshJ07/sc2002-restaurant-rush/tree/stage-2): adds VIP and Critic customers.
-- [stage-3-player-host](https://github.com/DevanshJ07/sc2002-restaurant-rush/tree/stage-3-player-host): revised Stage 3 snapshot with a player-controlled Host. Use `main` for that behaviour plus the later currency display fix.
+- [stage-3](https://github.com/DevanshJ07/sc2002-restaurant-rush/tree/stage-3): Host controlled by the player, ComboMeal, and Happy Hour. Includes the corrected opening display and dollar formatting.
 
-[Stage 1 → Stage 2](https://github.com/DevanshJ07/sc2002-restaurant-rush/compare/stage-1...stage-2) adds the VIP and Critic classes and tests, and updates the menu lookup and arrival schedule. [Stage 2 → current Stage 3](https://github.com/DevanshJ07/sc2002-restaurant-rush/compare/stage-2...main) adds Host, ComboMeal, PolicyManager and their tests, and updates setup, customer recovery, order pricing, turn coordination, prompts and replay inputs. No production classes were removed in either transition. After the stage tags, `main` also received a behaviour-preserving refactor (template method for billing, a new `GameStats` class, `seat()`/`abandon()`/`pay()` instead of `setState()`); the stage tags still show each stage as delivered. See [stage change notes](docs/STAGE_CHANGES.md) for details.
+### Stage 1 to Stage 2
+
+[Compare stage-1 to stage-2](https://github.com/DevanshJ07/sc2002-restaurant-rush/compare/stage-1...stage-2)
+
+| Change | Files | Reason |
+| --- | --- | --- |
+| Added | `VIPCustomer.java`, `CriticCustomer.java` | Add different satisfaction, pricing and food choice through customer subclasses. |
+| Added | `Stage2Checks.java`, `Stage2IntegrationChecks.java` | Check the new customer rules in isolation and in the game. |
+| Changed | `ArrivalSchedule.java` | Replace the arrivals on turns 4 and 10 with a VIP and Critic. |
+| Changed | `Menu.java` | Give the Critic a lookup for the most expensive item. |
+| Changed | `DomainChecks.java` | Share the check summary helper with the Stage 2 tests. |
+| Changed | `examples/victory.txt` | Reproduce a win with the Stage 2 customer schedule. |
+| Changed | `README.md`, `docs/STAGE_CHANGES.md` | Document Stage 2 and its replay results. |
+| Deleted | None | |
+
+### Stage 2 to Stage 3
+
+[Compare stage-2 to stage-3](https://github.com/DevanshJ07/sc2002-restaurant-rush/compare/stage-2...stage-3)
+
+| Change | Files | Reason |
+| --- | --- | --- |
+| Added | `Host.java` | Seat one queued customer using the Host's own action. |
+| Added | `ComboMeal.java` | Combine two menu items into one dish with its own price and preparation time. |
+| Added | `PolicyManager.java` | Manage Happy Hour activation, duration and discount. |
+| Added | `Stage3Checks.java`, `Stage3IntegrationChecks.java` | Check Host independence, combo pricing and Happy Hour timing. |
+| Added | `.gitattributes`, `docs/IMPLEMENTATION_NOTES.md` | Set consistent line endings and document integration decisions, respectively. |
+| Changed | `Main.java` | Register the combo, Host and policy in the game setup. |
+| Changed | `GameController.java` | Coordinate the Host phase, recovery, the policy timer and discounts on new orders. |
+| Changed | `GameCLI.java` | Show the opening state before arrivals and prompt for Happy Hour and the Host action. |
+| Changed | `Customer.java` | Allow eligible customers to recover satisfaction. |
+| Changed | `Order.java` | Allow the policy discount when a new order is placed. |
+| Changed | `ArrivalSchedule.java` | Validate turn numbers with a plain loop; keep the same six arrivals. |
+| Changed | `IntegrationChecks.java` | Exercise the Stage 3 prompts and replay flow. |
+| Changed | `examples/victory.txt`, `examples/defeat.txt` | Supply the extra Host and Happy Hour inputs for both replays. |
+| Changed | `scripts/run.ps1` | Stop the launcher if the build fails. |
+| Changed | `README.md`, `docs/STAGE_CHANGES.md` | Document the Stage 3 rules, checks and replay results. |
+| Deleted | None | |
+
+### Refactor after Stage 3
+
+[Compare stage-3 to main](https://github.com/DevanshJ07/sc2002-restaurant-rush/compare/stage-3...main). After tagging Stage 3, the team moved scorekeeping into `GameStats`, made `calculateBill()` a template method, and replaced general customer state changes with guarded operations such as `seat()`, `abandon()` and `pay()`. The replay results stayed the same. See the [stage change notes](docs/STAGE_CHANGES.md) for details.
 
 ## Source and demo notes
 
