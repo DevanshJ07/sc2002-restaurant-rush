@@ -2,7 +2,7 @@
 
 **Role:** documentation, SOLID review and the final refactor after Stage 3.
 **Tool:** Claude (Anthropic), one long conversation, 6–15 Nov 2026.
-**Full transcript:** [chat-01.md](chat-01.md), unedited and in order.
+**Full transcript:** to see the full chat, open my branch `ai-history/minh`, folder `ai-history/stage-3/`.
 **This page:** my own index of that conversation, drafted with Claude's help and checked by me. The transcript is the record.
 
 All of this happened after the stage-3 tag (6 Nov), so it is filed under stage-3.
