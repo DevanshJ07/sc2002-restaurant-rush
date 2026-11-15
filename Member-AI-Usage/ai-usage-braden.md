@@ -19,9 +19,9 @@ Seven conversations, oldest first. "Stage" is the suggested `ai-history` folder;
 | --- | --- | --- | --- | --- |
 | 1 | 17 Oct | Verify sequence diagram in text format | Sequence + class diagram (Stage 3) | Mermaid sequence diagram; 6 fixes to my class diagram|
 | 2 | 22 Oct | To do list generation | Planning (all stages) | Task list by stage, reordered into SDLC phases |
-| 3 | 28 Oct | Review proposed changes to class diagram | Class spec + code (all stages) | 15 accepted design changes|
+| 3 | 28 Oct | Review proposed changes to class diagram | Class spec | 15 accepted design changes|
 | 4 | 31 Oct | Verify draw.io sequence diagram | 3 stage class diagrams | .drawio sequence diagram walkthrough, design-rationale doc, Stage 1/2/3 split |
-| 5 | 5 Nov | Class diagram discrepancies | Diagrams aligned to code (all stages) | Spec audit; 4 diagram updates; sequence diagram + walkthrough updated |
+| 5 | 5 Nov | Class diagram discrepancies | Diagrams aligned to code (all stages) | Spec audit; sequence diagram walkthrough updated |
 | 6 | 6 Nov | Host seating and class diagram | Host behaviour (Stage 3) | 3 new methods; sequence diagram changed to manager-chosen seating |
 | 7 | 14 Nov | PowerPoint presentation request | Presentation (Parts 3 to 5) | 21-slide deck with speaker notes; script doc |
 
@@ -42,7 +42,7 @@ Seven conversations, oldest first. "Stage" is the suggested `ai-history` folder;
 ### 3. Review proposed changes to class diagram (28 Oct)
 
 - **I asked:** to review the group's 15 proposed changes (`SC2002_Group_4_Refined.pdf`), keep only those that made sense, and apply them to the class list PDF (`SC2002_Group_4.pdf`) and the v3 annotated diagram.
-- **AI produced:** accepted all 15 (e.g. `readyToPayTurn` + `collectPayment`, typed staff fields instead of a list, game loop moved to `GameCLI.run()`, `InvalidActionException`, money as int cents) and added its own fixes ("owns" wording, `getCustomers()` returns a copy, integer-division fix, missing getters). Rebuilt the PDF and diagram and cross-checked them.
+- **AI produced:** accepted all 15 (e.g. `readyToPayTurn` + `collectPayment`, typed staff fields instead of a list, game loop moved to `GameCLI.run()`, `InvalidActionException`, money as int cents) and added its own fixes ("owns" wording, `getCustomers()` returns a copy, integer-division fix, missing getters). Rebuilt the PDF.
 - **Follow-up:** I asked for the game code. AI wrote a 23-file Java implementation (`RestaurantRush.zip`), compiled it and ran scripted test games. It flagged placeholder values to replace from the brief (prices, table count, VIP/Critic arrivals, victory thresholds) and split classes by stage.
 
 ### 4. Draw.io sequence diagram (31 Oct)
@@ -53,8 +53,8 @@ Seven conversations, oldest first. "Stage" is the suggested `ai-history` folder;
 
 ### 5. Class diagram discrepancies (5 Nov)
 
-- **I asked:** first, an audit of the class diagram against the spec without changes; then 4 updates so diagrams match our actual code (not the other way round).
-- **AI produced:** audit (missing `InvalidActionException` dependency, inconsistent static/final markings, composition vs aggregation question). Then added `finishWaiterPhase()`, made `happyHourActive` derived, marked `MAX_TURNS` `public static final`, and added display getters across all 3 stage files, same filenames, with a change table.
+- **I asked:** first, an audit of the class diagram against the spec without changes; then 4 changes to make so diagrams match our actual code (not the other way round).
+- **AI produced:** audit (missing `InvalidActionException` dependency, inconsistent static/final markings, composition vs aggregation question). Then added `finishWaiterPhase()`, made `happyHourActive` derived, marked `MAX_TURNS` `public static final`, and added display getters across all 3 stage files.
 - **Follow-up:** matching sequence diagram edits, and the walkthrough PDF rebuilt (now 122 steps) plus a Google-Docs-friendly HTML version.
 
 ### 6. Host seating and class diagram (6 Nov)
@@ -75,7 +75,7 @@ Seven conversations, oldest first. "Stage" is the suggested `ai-history` folder;
 | Class diagram | First version drawn myself in draw.io; chose which changes to accept | Gap checks against the brief, edits to v2 to v5, Stage 1/2/3 split, OOP annotations |
 | Design decisions | Manager-chosen Host seating; Host acts before Waiter; diagrams follow the code, not the reverse; no formatting changes | Checked decisions against the brief; proposed method signatures |
 | Sequence diagram | Initial sequence diagram; Chose to keep it consistent with the class diagram and code; requested each change | sequence diagram walkthrough docs, updates |
-| Documentation | Directed content; asked for assumptions to be labelled | Design-rationale doc, connector tables, walkthrough |
+| Documentation | Directed content; asked for assumptions to be labelled | Connector tables, walkthrough |
 | Presentation | Original (shorter) script and part split with teammates | Slide deck, extended speaker notes, script doc |
 
 ## How I verified AI output
@@ -83,7 +83,7 @@ Seven conversations, oldest first. "Stage" is the suggested `ai-history` folder;
 I did not accept changes without a check against the brief, the code or the original file.
 
 - **Audit before editing:** asked for discrepancy reports first (chats 1, 5), then chose which fixes to apply.
-- **Change tables:** required a before/after table for every diagram edit (chats 5, 6).
+- **Change tables:** required a before/after table for every diagram edit suggestion (chats 5, 6).
 - **Versioned files:** kept earlier versions (v1 to v5) untouched so changes could be compared.
 - **Cross-checks:** every sequence-diagram message was matched to a class-diagram method; stage diagrams were checked so Stages 2 and 3 only add to Stage 1.
 - **Pushed back on errors:** e.g. in chat 6, corrected AI's claim that the class diagram needed no change for Host seating.
